@@ -6,13 +6,21 @@
 
     <groupId>pl.com.revolut</groupId>
     <artifactId>money-transfer</artifactId>
+    <packaging>pom</packaging>
     <version>1.0</version>
+    <modules>
+        <module>common</module>
+        <module>api</module>
+        <module>core</module>
+        <module>web</module>
+    </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
+        <pl.pojo.version>0.7.5</pl.pojo.version>
     </properties>
 
     <build>
@@ -23,9 +31,9 @@
                 <version>4.3.0</version>
                 <configuration>
                     <repoToken>vBLlGW6HYe28zoPEZpuC6qegNXLNA7Hmy</repoToken>
+                    <jacocoReports>${project.reporting.outputDirectory}/jacoco/jacoco.xml</jacocoReports>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
