@@ -1,5 +1,6 @@
 package pl.org.revolut.service;
 
+import pl.org.revolut.exception.NullParameterException;
 import pl.org.revolut.model.Customer;
 import pl.org.revolut.model.identifier.CustomerId;
 
@@ -17,20 +18,20 @@ public interface CustomerService {
     /**
      * add or update the customer
      */
-    void addOrUpdateCustomer(Customer customer);
+    void addOrUpdateCustomer(Customer customer) throws NullParameterException;
 
 
     /**
      * remove existing customer by customerId
      * return true if it can delete
      */
-    Boolean removeCustomer(CustomerId customerId);
+    Boolean removeCustomer(CustomerId customerId) throws NullParameterException;
 
     /**
      * @param customerId belongs to customer
      * getcustomerById
      * @return customer by {@code customerId}
      */
-    Customer getCustomerById(CustomerId customerId);
+    Customer getCustomerById(CustomerId customerId) throws NullParameterException;
 
 }
