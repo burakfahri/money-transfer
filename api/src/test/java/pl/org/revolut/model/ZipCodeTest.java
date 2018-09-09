@@ -12,7 +12,7 @@ import pl.pojo.tester.internal.field.DefaultFieldValueChanger;
 
 public class ZipCodeTest{
 
-	private final String []zipCodes = {"06400", "06500","045599","abc"};
+	private final String []zipCodes = {"06400", "06500","04559","abc"};
 
 	@Test
 	public void testEqualsZipCode() {
