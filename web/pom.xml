@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>pl.com.revolut</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>money-transfer-api</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

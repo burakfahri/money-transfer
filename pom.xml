@@ -20,7 +20,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
-        <pl.pojo.version>0.7.5</pl.pojo.version>
+        <pl.pojo.version>0.7.6</pl.pojo.version>
     </properties>
 
     <build>
