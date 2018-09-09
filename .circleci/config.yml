@@ -3,11 +3,6 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
-
-dependencies:
-  override:
-    - mvn install -DskipTests
-
 jobs:
   build:
     docker:
@@ -28,14 +23,7 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "pom.xml" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: mvn dependency:go-offline
+      - run: mvn clean package
 
       - save_cache:
           paths:
