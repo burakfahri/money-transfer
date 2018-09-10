@@ -8,8 +8,10 @@
         <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>money-transfer-core</artifactId>
+    <packaging>jar</packaging>
 
-    <artifactId>core</artifactId>
+    <name>Money Transfer: CORE</name>
     <dependencies>
         <dependency>
             <groupId>pl.com.revolut</groupId>
