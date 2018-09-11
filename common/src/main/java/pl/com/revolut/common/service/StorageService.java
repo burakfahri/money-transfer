@@ -1,7 +1,7 @@
 package pl.com.revolut.common.service;
 
-import pl.com.revolut.common.exception.NullParameterException;
-import pl.com.revolut.common.utils.impl.ServiceImplUtils;
+import pl.com.revolut.exception.NullParameterException;
+import pl.com.revolut.common.utils.impl.ServiceUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,17 +23,17 @@ public abstract class StorageService<K,V> {
     }
 
     protected final V getItem(final K key) throws NullParameterException {
-        ServiceImplUtils.checkParameters(key);
+        ServiceUtils.checkParameters(key);
         return map.get(key);
     }
 
     protected final void addOrUpdateItem(final K key, final V value) throws NullParameterException {
-        ServiceImplUtils.checkParameters(key,value);
+        ServiceUtils.checkParameters(key,value);
         map.put(key,value);
     }
 
     protected final V remove(final K key) throws NullParameterException {
-        ServiceImplUtils.checkParameters(key);
+        ServiceUtils.checkParameters(key);
         return map.remove(key);
     }
 }

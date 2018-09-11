@@ -3,7 +3,7 @@ package pl.com.revolut.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.com.revolut.common.exception.PhoneNumberException;
+import pl.com.revolut.exception.PhoneNumberException;
 
 @Getter
 @EqualsAndHashCode

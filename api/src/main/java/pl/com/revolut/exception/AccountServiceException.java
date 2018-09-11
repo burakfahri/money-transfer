@@ -1,4 +1,4 @@
-package pl.com.revolut.common.exception;
+package pl.com.revolut.exception;
 
 public class AccountServiceException extends Exception{
     private static final String ACCOUNT_SERVICE_NULL = "ACCOUNT SERVICE IS NULL";

@@ -15,4 +15,5 @@ public class Transaction {
     Date date;
     BigDecimal amount;
     String explanation;
+    TransactionType transactionType;
 }

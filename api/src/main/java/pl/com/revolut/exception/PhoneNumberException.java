@@ -1,4 +1,4 @@
-package pl.com.revolut.common.exception;
+package pl.com.revolut.exception;
 
 public class PhoneNumberException extends Exception{
     private static final String WRONG_PHONE_NUMBER = "PHONE NUMBER IS WRONG";

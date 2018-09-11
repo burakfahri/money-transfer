@@ -11,7 +11,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class Customer {
-    @NonNull
     CustomerId customerId;
     String customerName;
     String customerSurname;

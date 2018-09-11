@@ -30,9 +30,11 @@ public class Main {
 
     private static void init() {
         accountService = AccountServiceImpl.getAccountServiceInstance();
-        transactionService = TransactionServiceImpl.getTransactionService();
+        transactionService = TransactionServiceImpl.getTransactionServiceInstance();
         customerService = CustomerServiceImpl.getCustomerServiceInstance();
+
         transactionService.setAccountService(accountService);
+        accountService.setCustomerService(customerService);
     }
 
     private static void startService() throws Exception {

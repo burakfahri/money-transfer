@@ -1,8 +1,9 @@
 package pl.com.revolut.model;
 
 import lombok.NoArgsConstructor;
-import pl.com.revolut.common.exception.ZipCodeException;
+
 import lombok.Getter;
+import pl.com.revolut.exception.ZipCodeException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

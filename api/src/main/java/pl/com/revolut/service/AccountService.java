@@ -1,12 +1,20 @@
 package pl.com.revolut.service;
 
-import pl.com.revolut.common.exception.NullParameterException;
+import pl.com.revolut.exception.AccountException;
+import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.model.Account;
 import pl.com.revolut.model.identifier.AccountId;
+import pl.com.revolut.model.identifier.TransactionId;
 
 import java.util.List;
 
 public interface AccountService {
+
+    /**
+     * sets the customer service
+     * @param customerService
+     */
+    void setCustomerService(CustomerService customerService);
 
     /**
      *
@@ -25,7 +33,7 @@ public interface AccountService {
      * remove existing account by accountId
      * return true if it can delete
      */
-    Account removeAccount(AccountId accountId) throws NullParameterException;
+    Account removeAccount(AccountId accountId) throws NullParameterException, AccountException;
 
     /**
      * @param accountId belongs to Account
@@ -33,5 +41,11 @@ public interface AccountService {
      * @return account by {@code accountId}
      */
     Account getAccountById(AccountId accountId) throws NullParameterException;
+
+    Boolean addTransactionToAccount(AccountId accountId, TransactionId transactionId) throws NullParameterException;
+
+    Boolean removeTransactionFromAccount(TransactionId transactionId, AccountId accountId) throws NullParameterException;
+
+    List<TransactionId> getTransactionsOfAccount(AccountId accountId) throws NullParameterException;
 
 }

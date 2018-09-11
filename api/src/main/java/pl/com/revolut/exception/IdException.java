@@ -1,4 +1,4 @@
-package pl.com.revolut.common.exception;
+package pl.com.revolut.exception;
 
 public class IdException extends Exception{
     private static final String INVALID_ID = "ID IS NOT VALID";

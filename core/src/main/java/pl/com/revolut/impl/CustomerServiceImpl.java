@@ -1,17 +1,22 @@
 package pl.com.revolut.impl;
 
 import pl.com.revolut.common.service.StorageService;
-import pl.com.revolut.common.exception.NullParameterException;
-import pl.com.revolut.common.utils.impl.ServiceImplUtils;
+import pl.com.revolut.exception.NullParameterException;
+import pl.com.revolut.common.utils.impl.ServiceUtils;
 import pl.com.revolut.model.Customer;
+import pl.com.revolut.model.identifier.AccountId;
 import pl.com.revolut.model.identifier.CustomerId;
 import pl.com.revolut.service.CustomerService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class CustomerServiceImpl extends StorageService<CustomerId,Customer> implements CustomerService  {
     private static CustomerService customerServiceInstance = null;
+    private Map<CustomerId,List<AccountId>> customerIdToAccountId = new ConcurrentHashMap<>();
 
     private CustomerServiceImpl() {
         super();
@@ -31,20 +36,47 @@ public class CustomerServiceImpl extends StorageService<CustomerId,Customer> imp
 
     @Override
     public void addOrUpdateCustomer(Customer customer) throws NullParameterException {
-        ServiceImplUtils.checkParameters(customer);
+        ServiceUtils.checkParameters(customer);
         super.addOrUpdateItem(customer.getCustomerId(),customer);
     }
 
     @Override
-    public Boolean removeCustomer(CustomerId customerId) throws NullParameterException {
-        ServiceImplUtils.checkParameters(customerId);
+    public Customer removeCustomer(CustomerId customerId) throws NullParameterException {
+        ServiceUtils.checkParameters(customerId);
 
-        return super.remove(customerId) != null;
+        return super.remove(customerId) ;
     }
 
     @Override
     public Customer getCustomerById(CustomerId customerId) throws NullParameterException {
-        ServiceImplUtils.checkParameters(customerId);
+        ServiceUtils.checkParameters(customerId);
         return super.getItem(customerId);
+    }
+
+    @Override
+    public Boolean addAccountToCustomer(CustomerId customerId, AccountId accountId) throws NullParameterException {
+        ServiceUtils.checkParameters(customerId,accountId);
+        List<AccountId> accountIdList = customerIdToAccountId.getOrDefault(customerId,new ArrayList<>());
+        if(accountIdList.contains(accountId))
+            return false;
+        accountIdList.add(accountId);
+        return true;
+    }
+
+    @Override
+    public Boolean removeAccountFromCustomer(CustomerId customerId, AccountId accountId) throws NullParameterException {
+        ServiceUtils.checkParameters(customerId,accountId);
+        List<AccountId> accountIdList = customerIdToAccountId.getOrDefault(customerId,new ArrayList<>());
+        if(!accountIdList.contains(accountId))
+            return false;
+        accountIdList.remove(accountId);
+        customerIdToAccountId.put(customerId,accountIdList);
+        return true;
+    }
+
+    @Override
+    public List<AccountId> getCustomerAccounts(CustomerId customerId) throws NullParameterException {
+        ServiceUtils.checkParameters(customerId);
+        return customerIdToAccountId.getOrDefault(customerId,new ArrayList<>());
     }
 }

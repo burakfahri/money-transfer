@@ -8,9 +8,16 @@
         <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>money-transfer-common</artifactId>
+    <packaging>jar</packaging>
 
-    <artifactId>common</artifactId>
+    <name>Money Transfer: COMMON</name>
     <dependencies>
+        <dependency>
+            <groupId>pl.com.revolut</groupId>
+            <artifactId>money-transfer-api</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

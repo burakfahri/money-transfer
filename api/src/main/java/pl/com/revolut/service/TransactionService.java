@@ -1,9 +1,6 @@
 package pl.com.revolut.service;
 
-import pl.com.revolut.common.exception.AccountException;
-import pl.com.revolut.common.exception.AccountServiceException;
-import pl.com.revolut.common.exception.NullParameterException;
-import pl.com.revolut.common.exception.TransactionException;
+import pl.com.revolut.exception.*;
 import pl.com.revolut.model.Transaction;
 import pl.com.revolut.model.identifier.TransactionId;
 import pl.com.revolut.model.identifier.AccountId;
@@ -26,46 +23,39 @@ public interface TransactionService {
 
     List<Transaction> getAllTransactions();
 
-    /**
-     * add or update the transaction
-     */
-    void addOrUpdateTransaction(Transaction transaction) throws NullParameterException;
-
-
-    /**
-     * remove existing transaction by transactionId
-     * return true if it can delete
-     */
-    Boolean removeTransaction(TransactionId transactionId) throws NullParameterException;
 
     /**
      * @param transactionId belongs to transaction
      * gettransactionById
      * @return transaction by {@code transactionId}
      */
-    Transaction getTransactionById(TransactionId transactionId) throws  NullParameterException;
+    Transaction getTransactionById(TransactionId transactionId)
+            throws  NullParameterException;
 
 
     /**
      *
      * @param accountId of Account which would use for deposits
-     * @param amounth of for deposit
+     * @param amount of for deposit
      */
-    void deposit(AccountId accountId, BigDecimal amounth) throws NullParameterException, AccountServiceException, AccountException;
+    void deposit(AccountId accountId, BigDecimal amount)
+            throws NullParameterException, AccountServiceException, AccountException, IdException;
 
     /**
      *
      * @param accountId of Account which would use for withdraw
-     * @param amounth of for amounth
+     * @param amount of for amount
      */
-    void withDraw(AccountId accountId, BigDecimal amounth) throws AccountServiceException, NullParameterException, AccountException, TransactionException;
+    void withDraw(AccountId accountId, BigDecimal amount)
+            throws AccountServiceException, NullParameterException, AccountException, TransactionException, IdException;
 
     /**
      * money transfer btw two accounts
-     * @param senderAcountId sender acount id
+     * @param senderAccountId sender acount id
      * @param receiverAccountId receiver acount id
-     * @param amounth of the money which would be transfered.
+     * @param amount of the money which would be transfered.
      */
-    void transfer(AccountId senderAcountId,AccountId receiverAccountId, BigDecimal amounth) throws NullParameterException, AccountServiceException, AccountException, TransactionException;
+    void transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl)
+            throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException;
 
 }

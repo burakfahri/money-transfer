@@ -1,4 +1,4 @@
-package pl.com.revolut.common.exception;
+package pl.com.revolut.exception;
 
 public class NullParameterException extends Exception{
     private static final String NULL_PARAMETER = "PARAMETER IS NULL";
