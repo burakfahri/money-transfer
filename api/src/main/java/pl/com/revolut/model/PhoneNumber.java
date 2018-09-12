@@ -3,11 +3,13 @@ package pl.com.revolut.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import pl.com.revolut.exception.PhoneNumberException;
 
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
+@ToString
 public class PhoneNumber {
     private int area;   // area code (3 digits)
     private int exch;   // exchange  (3 digits)

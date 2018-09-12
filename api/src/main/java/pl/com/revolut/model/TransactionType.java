@@ -3,8 +3,6 @@ package pl.com.revolut.model;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import lombok.Getter;
-import lombok.Setter;
 
 
 @NoArgsConstructor
@@ -15,7 +13,6 @@ public enum TransactionType {
     WITHDRAW("WithDraw"),
     TRANSFER("Transfer");
 
-    @Setter
-    @Getter
+
     private String type;
 }
