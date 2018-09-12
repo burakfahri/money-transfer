@@ -5,6 +5,7 @@ import lombok.NonNull;
 
 @Data
 public abstract class Id {
+    protected transient String DASH = "-";
     @NonNull
     String id;
 }

@@ -1,5 +1,6 @@
 package pl.com.revolut.service;
 
+import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.model.identifier.AccountId;
 import pl.com.revolut.model.identifier.CustomerId;
@@ -26,7 +27,7 @@ public interface CustomerService {
      * remove existing customer by customerId
      * return true if it can delete
      */
-    Customer removeCustomer(CustomerId customerId) throws NullParameterException;
+    Customer removeCustomer(CustomerId customerId) throws NullParameterException, AccountException;
 
     /**
      * @param customerId belongs to customer

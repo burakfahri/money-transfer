@@ -8,7 +8,7 @@ import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 public class TransactionTest {
     @Test
     public void testTransaction() {
-        assertPojoMethodsFor(Transaction.class).testing(Method.values()).areWellImplemented();
+        assertPojoMethodsFor(Transaction.class).testing(Method.GETTER,Method.TO_STRING).areWellImplemented();
     }
 
 }

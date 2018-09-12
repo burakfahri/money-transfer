@@ -70,35 +70,45 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
     }
 
     @Override
-    public void deposit(AccountId accountId, BigDecimal amount) throws NullParameterException, AccountServiceException,
+    public Transaction deposit(AccountId accountId, BigDecimal amount) throws NullParameterException, AccountServiceException,
             AccountException, IdException {
 
         Account account = checkParametersAndReturnAccount(accountId,amount);
 
         Transaction transaction = ServiceUtils.createDepositOrWithDrawTransaction(amount, TransactionType.DEPOSIT,accountId);
 
-        addOrUpdateTransaction(transaction);
-        accountServiceInstance.addTransactionToAccount(accountId, transaction.getTransactionId());
+        addMoneyFromTheAccount(account,transaction.getTransactionId(),account.getCurrentBalance().add(amount));
 
-        setCurrentMoneyAndSetAccount(account,amount);
+        addOrUpdateTransaction(transaction);
+        return transaction;
     }
 
+
+
     private void setCurrentMoneyAndSetAccount(Account account,BigDecimal amount) throws NullParameterException {
-        account.setCurrentBalance(account.getCurrentBalance().add(amount));
+        account.setCurrentBalance(amount);
         accountServiceInstance.addOrUpdateAccount(account);
     }
 
-    private void removeMoneyFromTheAccount (Account account,TransactionId transactionId,BigDecimal amount) throws TransactionException, NullParameterException {
+    private void addMoneyFromTheAccount (Account account,TransactionId transactionId,BigDecimal amount)
+            throws  NullParameterException {
 
-        if (amount.compareTo(account.getCurrentBalance()) < 0) {
+        accountServiceInstance.addTransactionToAccount(account.getAccountId(),transactionId);
+        setCurrentMoneyAndSetAccount(account,account.getCurrentBalance().add(amount));
+    }
+
+    private void removeMoneyFromTheAccount (Account account,TransactionId transactionId,BigDecimal amount)
+            throws TransactionException, NullParameterException {
+
+        if (amount.compareTo(account.getCurrentBalance()) > 0) {
             throw new TransactionException("ACCOUNT IS NOT ABLE TO WITHDRAW");
         }
-        accountServiceInstance.removeTransactionFromAccount(transactionId,account.getAccountId());
-        setCurrentMoneyAndSetAccount(account,amount);
+        accountServiceInstance.addTransactionToAccount(account.getAccountId(),transactionId);
+        setCurrentMoneyAndSetAccount(account,account.getCurrentBalance().subtract(amount));
     }
 
     @Override
-    public void withDraw(AccountId accountId, BigDecimal amount) throws AccountServiceException, NullParameterException,
+    public Transaction withDraw(AccountId accountId, BigDecimal amount) throws AccountServiceException, NullParameterException,
             AccountException, TransactionException, IdException {
 
         Account account = checkParametersAndReturnAccount(accountId,amount);
@@ -109,10 +119,11 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
         removeMoneyFromTheAccount(account,transaction.getTransactionId(),amount);
 
         addOrUpdateTransaction(transaction);
+        return transaction;
     }
 
     @Override
-    public void transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl) throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException {
+    public Transaction transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl) throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException {
         Account receiverAccount = checkParametersAndReturnAccount(receiverAccountId,amount);
         Account senderAccount = checkParametersAndReturnAccount(senderAccountId,amount);
 
@@ -120,8 +131,10 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
 
         removeMoneyFromTheAccount(senderAccount,transaction.getTransactionId(),amount);
 
+        addMoneyFromTheAccount(receiverAccount,transaction.getTransactionId(),amount);
 
-        receiverAccount.setCurrentBalance(receiverAccount.getCurrentBalance().add(amount));
-        setCurrentMoneyAndSetAccount(receiverAccount,amount);
+        addOrUpdateTransaction(transaction);
+
+        return transaction;
     }
 }

@@ -12,6 +12,8 @@ import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
 import pl.com.revolut.service.TransactionService;
 import pl.com.revolut.web.AccountWebService;
+import pl.com.revolut.web.CustomerWebService;
+import pl.com.revolut.web.TransactionWebService;
 
 
 public class Main {
@@ -44,7 +46,8 @@ public class Main {
         server.setHandler(context);
         ServletHolder servletHolder = context.addServlet(ServletContainer.class, "/*");
         servletHolder.setInitParameter("jersey.config.server.provider.classnames",
-                AccountWebService.class.getCanonicalName());
+                AccountWebService.class.getCanonicalName()+","+TransactionWebService.class.getCanonicalName()+","+
+                        CustomerWebService.class.getCanonicalName());
         try {
             server.start();
             server.join();

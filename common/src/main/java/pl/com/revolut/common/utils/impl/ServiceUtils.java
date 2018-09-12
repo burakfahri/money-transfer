@@ -34,13 +34,16 @@ public final class ServiceUtils {
         {
             case DEPOSIT:
                 transaction.setSenderAccountId(accountId);
+                transaction.setTransactionType(TransactionType.DEPOSIT);
                 break;
             case WITHDRAW:
+                transaction.setTransactionType(TransactionType.WITHDRAW);
                 transaction.setReceiverAccountId(accountId);
                 break;
         }
         transaction.setTransactionId(new TransactionId(IdGenerator.generateTransactionId()));
         transaction.setAmount(amount);
+        transaction.setDate(Calendar.getInstance().getTime());
         return transaction;
     }
 

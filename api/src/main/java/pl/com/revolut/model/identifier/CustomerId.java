@@ -1,13 +1,14 @@
 package pl.com.revolut.model.identifier;
 
 
+import lombok.EqualsAndHashCode;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 
-
+@EqualsAndHashCode
 public class CustomerId extends Id {
-    private final String CUSTOMER_ID_PREFIX = "CUS";
-    private final String DASH = "-";
+    private transient final String CUSTOMER_ID_PREFIX = "CUS";
+
     public CustomerId(String id) throws IdException, NullParameterException {
         super(id);
         if(!validateCustomerId(id)) throw new IdException();

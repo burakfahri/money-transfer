@@ -2,7 +2,7 @@ package pl.com.revolut.model;
 
 import org.junit.Assert;
 import org.junit.Test;
-import pl.com.revolut.common.exception.ZipCodeException;
+import pl.com.revolut.exception.ZipCodeException;
 
 
 public class ZipCodeTest{

@@ -44,7 +44,7 @@ public class AccountWebService {
         try {
             account = accountService.getAccountById(new AccountId(accountId));
             if(account == null)
-                return Response.status(Response.Status.NOT_FOUND).build();
+                return Response.status(Response.Status.NOT_FOUND).entity("Account does not exist").build();
         } catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Account id is not acceptable").build();
         }catch (IdException ie) {
@@ -64,7 +64,7 @@ public class AccountWebService {
         try {
             log.info(uriInfo);
             account = gson.fromJson(stringAccount,Account.class);
-            if(account.getAccountId() == null)
+            if(account.getAccountId() != null)
                 return Response.status(Response.Status.BAD_REQUEST).entity("Accound id must " +
                         "be null while creating new account").build();
 
@@ -72,7 +72,7 @@ public class AccountWebService {
             account.setAccountId(new AccountId(accountId));
             Customer customer = customerService.getCustomerById(account.getCustomerId());
             if(customer == null)
-                return Response.status(Response.Status.BAD_REQUEST).entity("Customer id is wrong").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Customer id does not exist").build();
             uri = WebUtils.generateUri(uriInfo,accountId);
             accountService.addOrUpdateAccount(account);
         }catch (NullParameterException e) {
@@ -133,7 +133,9 @@ public class AccountWebService {
         }catch (JsonSyntaxException je) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
         }
-        return Response.accepted().entity(account).build();
+        return Response.ok(gson.toJson(account)).build();
     }
+
+
 
 }

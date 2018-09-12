@@ -38,7 +38,7 @@ public interface TransactionService {
      * @param accountId of Account which would use for deposits
      * @param amount of for deposit
      */
-    void deposit(AccountId accountId, BigDecimal amount)
+    Transaction deposit(AccountId accountId, BigDecimal amount)
             throws NullParameterException, AccountServiceException, AccountException, IdException;
 
     /**
@@ -46,7 +46,7 @@ public interface TransactionService {
      * @param accountId of Account which would use for withdraw
      * @param amount of for amount
      */
-    void withDraw(AccountId accountId, BigDecimal amount)
+    Transaction withDraw(AccountId accountId, BigDecimal amount)
             throws AccountServiceException, NullParameterException, AccountException, TransactionException, IdException;
 
     /**
@@ -55,7 +55,7 @@ public interface TransactionService {
      * @param receiverAccountId receiver acount id
      * @param amount of the money which would be transfered.
      */
-    void transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl)
+    Transaction transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl)
             throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException;
 
 }

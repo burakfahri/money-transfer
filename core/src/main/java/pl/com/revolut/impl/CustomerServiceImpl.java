@@ -1,6 +1,7 @@
 package pl.com.revolut.impl;
 
 import pl.com.revolut.common.service.StorageService;
+import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.common.utils.impl.ServiceUtils;
 import pl.com.revolut.model.Customer;
@@ -9,6 +10,7 @@ import pl.com.revolut.model.identifier.CustomerId;
 import pl.com.revolut.service.CustomerService;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,13 +39,16 @@ public class CustomerServiceImpl extends StorageService<CustomerId,Customer> imp
     @Override
     public void addOrUpdateCustomer(Customer customer) throws NullParameterException {
         ServiceUtils.checkParameters(customer);
+        customer.setAttendDate(Calendar.getInstance().getTime());
         super.addOrUpdateItem(customer.getCustomerId(),customer);
     }
 
     @Override
-    public Customer removeCustomer(CustomerId customerId) throws NullParameterException {
+    public Customer removeCustomer(CustomerId customerId) throws NullParameterException, AccountException {
         ServiceUtils.checkParameters(customerId);
-
+        List<AccountId> accountIdList = customerIdToAccountId.get(customerId);
+        if(accountIdList != null && !accountIdList.isEmpty())
+            throw new AccountException("User can not delete while it has accounts");
         return super.remove(customerId) ;
     }
 
@@ -60,6 +65,7 @@ public class CustomerServiceImpl extends StorageService<CustomerId,Customer> imp
         if(accountIdList.contains(accountId))
             return false;
         accountIdList.add(accountId);
+        customerIdToAccountId.put(customerId,accountIdList);
         return true;
     }
 

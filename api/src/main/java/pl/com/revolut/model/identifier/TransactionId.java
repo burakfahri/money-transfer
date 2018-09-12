@@ -5,8 +5,7 @@ import pl.com.revolut.exception.NullParameterException;
 
 
 public class TransactionId extends Id {
-    private String TRANSACTION_ID_PREFIX = "TRA";
-    private String DASH = "-";
+    private transient  String TRANSACTION_ID_PREFIX = "TRA";
     public TransactionId(String id) throws NullParameterException, IdException {
         super(id);
         if(!validateTransactionId(id)) throw new IdException();

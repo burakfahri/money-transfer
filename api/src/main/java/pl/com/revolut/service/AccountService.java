@@ -46,6 +46,6 @@ public interface AccountService {
 
     Boolean removeTransactionFromAccount(TransactionId transactionId, AccountId accountId) throws NullParameterException;
 
-    List<TransactionId> getTransactionsOfAccount(AccountId accountId) throws NullParameterException;
+    List<TransactionId> getTransactionsOfAccount(AccountId accountId) throws NullParameterException, AccountException;
 
 }

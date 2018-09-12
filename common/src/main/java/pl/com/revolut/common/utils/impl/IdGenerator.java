@@ -20,13 +20,13 @@ public class IdGenerator {
 
     public static String generateCustomerId()
     {
-        return new StringBuilder().append(CUSTOMER_ID_PREFIX).append(String.valueOf(customerIdCount++)).toString();
+        return new StringBuilder().append(CUSTOMER_ID_PREFIX).append(DASH).append(String.valueOf(customerIdCount++)).toString();
     }
 
 
     public static String generateTransactionId()
     {
-        return new StringBuilder().append(TRANSACTION_ID_PREFIX).append(String.valueOf(transactionIdCount++)).toString();
+        return new StringBuilder().append(TRANSACTION_ID_PREFIX).append(DASH).append(String.valueOf(transactionIdCount++)).toString();
     }
 
 }

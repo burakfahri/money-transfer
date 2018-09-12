@@ -1,11 +1,12 @@
 package pl.com.revolut.model.identifier;
 
+import lombok.EqualsAndHashCode;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 
+@EqualsAndHashCode
 public class AccountId extends Id {
-    private final String ACCOUNT_ID_PREFIX = "ACC";
-    private final String DASH = "-";
+    private transient final String ACCOUNT_ID_PREFIX = "ACC";
 
     public AccountId(String id) throws NullParameterException, IdException {
         super(id);
