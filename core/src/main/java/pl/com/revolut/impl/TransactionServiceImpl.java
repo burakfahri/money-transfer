@@ -114,6 +114,8 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
 
         Transaction transaction = ServiceUtils.createDepositOrWithDrawTransaction(amount, TransactionType.WITHDRAW,accountId);
 
+        if(transaction == null)
+            throw new TransactionException();
 
         removeMoneyFromTheAccount(account,transaction.getTransactionId(),amount);
 

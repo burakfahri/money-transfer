@@ -9,7 +9,6 @@ import pl.com.revolut.model.identifier.AccountId;
 import pl.com.revolut.model.identifier.TransactionId;
 import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

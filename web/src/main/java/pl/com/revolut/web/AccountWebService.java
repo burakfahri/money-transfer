@@ -26,7 +26,9 @@ import java.net.URI;
 public class AccountWebService {
     private final AccountService accountService = AccountServiceImpl.getAccountServiceInstance();
     private final CustomerService customerService = CustomerServiceImpl.getCustomerServiceInstance();
-    private static final Logger log = Logger.getLogger(AccountWebService.class);
+    private static final String JSON_IS_NOT_VALID = "Json is not valid";
+    private static final String ID_IS_NOT_VALID = "Id is not valid";
+    private final Logger log = Logger.getLogger(AccountWebService.class);
     private Gson gson = new Gson();
 
     @GET
@@ -47,9 +49,9 @@ public class AccountWebService {
         } catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Account id is not acceptable").build();
         }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
         return Response.ok(gson.toJson(account)).build();
     }
@@ -64,7 +66,7 @@ public class AccountWebService {
             log.info(uriInfo);
             Account account = gson.fromJson(stringAccount,Account.class);
             if(account.getAccountId() != null)
-                return Response.status(Response.Status.BAD_REQUEST).entity("Accound id must " +
+                return Response.status(Response.Status.NOT_FOUND).entity("Accound id must " +
                         "be null while creating new account").build();
 
             String accountId = IdGenerator.generateAccountId();
@@ -77,9 +79,9 @@ public class AccountWebService {
         }catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Account model is wrong").build();
         }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
 
         return Response.created(uri).build();
@@ -108,11 +110,11 @@ public class AccountWebService {
             accountService.addOrUpdateAccount(account);
 
         }catch (NullParameterException e) {
-            return Response.serverError().entity("Account model is wrong").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Account model is wrong").build();
         } catch (IdException e) {
-            return Response.serverError().entity("Account id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Account id is not valid").build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
         return Response.accepted().entity(account).build();
     }
@@ -120,17 +122,17 @@ public class AccountWebService {
     @DELETE
     @Path("/{accountId}")
     public Response deleteAccount(@PathParam("accountId") String accountId){
-        Account account = null;
+        Account account;
         try {
             account = accountService.removeAccount(new AccountId(accountId));
             if(account == null)
                 return Response.status(Response.Status.NOT_FOUND).entity("Account is not found "+ accountId).build();
         }catch (NullParameterException e) {
-            return Response.serverError().entity("Account id is null").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Account id is null").build();
         } catch (IdException | AccountException e) {
-            return Response.serverError().entity("Id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
         return Response.ok(gson.toJson(account)).build();
     }

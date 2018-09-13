@@ -68,10 +68,9 @@ public interface TransactionService {
      * @param receiverAccountId receiver acount id
      * @param amount of the money which would be transfered.
      * @param expl which describe the details of the transfer optional
-     * @return
+     * @return the transaction of the transfer operation
      * @throws AccountException if there is any account belongs to {@param senderAccountId} or {@param receiverAccountId}
-     * @throws TransactionException if the sender which has {@param senderAccountId} does not have enough money to send
-     *                              @param amount
+     * @throws TransactionException if the sender which has {@param senderAccountId} does not have enough money to send {@param amount
      * @throws NullParameterException if the parameters are null
      * @throws AccountServiceException if there is not any account belongs to {@param senderAccountId} or {@param receiverAccountId}
      * @throws IdException if the id is not valid

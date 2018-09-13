@@ -16,7 +16,6 @@ import pl.com.revolut.model.identifier.TransactionId;
 import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
 import pl.com.revolut.service.TransactionService;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,6 +33,7 @@ public class TransactionWebService {
     private final TransactionService transactionService = TransactionServiceImpl.getTransactionServiceInstance();
     private final AccountService accountService = AccountServiceImpl.getAccountServiceInstance();
     private final CustomerService customerService = CustomerServiceImpl.getCustomerServiceInstance();
+    private static final String ACCOUNT_SERVICE_IS_NOT_VALID ="Account service is not valid";
 
     private static final Logger log = Logger.getLogger(AccountWebService.class);
     private Gson gson = new Gson();
@@ -49,7 +49,7 @@ public class TransactionWebService {
     @GET
     @Path("/{transactionId}")
     public Response getTransactionByTransactionId(@PathParam("transactionId") String transactionId){
-        Transaction transaction = null;
+        Transaction transaction;
         try {
             transaction = transactionService.getTransactionById(new TransactionId(transactionId));
             if(transaction == null)
@@ -67,7 +67,7 @@ public class TransactionWebService {
     @GET
     @Path("/account/{accountId}")
     public Response getAllTransactionsByAccountId(@PathParam("accountId") String accountIdString){
-        String transactionJsonList = null;
+        String transactionJsonList;
         try {
             
             AccountId accountId = new AccountId(accountIdString);
@@ -102,7 +102,7 @@ public class TransactionWebService {
     @GET
     @Path("customer/{customerId}")
     public Response getAllTransactionsByCustomerId(@PathParam("customerId") String customerIdStr){
-        String transactionJsonList = null;
+        String transactionJsonList;
         try {
             CustomerId customerId = new CustomerId(customerIdStr);
             
@@ -137,16 +137,16 @@ public class TransactionWebService {
     @POST
     @Path("/account/{accountId}/withdraw/{amount}")
     public Response withDraw(@PathParam("accountId") String accountId, @PathParam("amount") BigDecimal amount){
-        String transactionJson = null;
+        String transactionJson;
         try {
             Transaction transaction  = transactionService.withDraw(new AccountId(accountId),amount);
             transactionJson = gson.toJson(transaction);
         } catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Account id or amount can not be null").build();
         } catch (IdException | AccountException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Account id is not valid or does not exist").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("Account id is not valid or does not exist").build();
         }  catch (AccountServiceException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Account Service is not valid").build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ACCOUNT_SERVICE_IS_NOT_VALID).build();
         } catch (TransactionException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Account has not got enough money").build();
         }
@@ -158,7 +158,7 @@ public class TransactionWebService {
     @POST
     @Path("account/{accountId}/deposit/{amount}")
     public Response deposit(@PathParam("accountId") String accountId, @PathParam("amount") BigDecimal amount){
-        String transactionJson = null;
+        String transactionJson;
         try {
             Transaction transaction  = transactionService.deposit(new AccountId(accountId),amount);
             transactionJson = gson.toJson(transaction);
@@ -179,7 +179,7 @@ public class TransactionWebService {
     @Path("/transfer/from/{senderAccountId}/to/{receiverAccountId}/amount/{amount}/comment/{comment}")
     public Response transfer(@PathParam("senderAccountId") String senderAccountId,@PathParam("receiverAccountId")
             String receiverAccountId ,@PathParam("amount") BigDecimal amount,@PathParam("comment") String comment){
-        String transactionJson = null;
+        String transactionJson;
         try {
             Transaction transaction  = transactionService.transfer(new AccountId(senderAccountId),new AccountId(receiverAccountId)
                     ,amount,comment);

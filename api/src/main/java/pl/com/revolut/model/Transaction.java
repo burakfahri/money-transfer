@@ -16,7 +16,7 @@ import java.util.Date;
  * an instance of exchanging money
  */
 public class Transaction {
-    TransactionId transactionId;//identifier of a transaction , it starts with TRA-{id}
+    TransactionId transactionId; //identifier of a transaction , it starts with TRA-{id}
     AccountId senderAccountId;//account id of sender side , it is null when withdraw transactions
     AccountId receiverAccountId;////account id of receiver side , it is null when deposit transactions
     Date date;//date of the transaction occur

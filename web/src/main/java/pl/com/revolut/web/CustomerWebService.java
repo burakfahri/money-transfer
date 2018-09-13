@@ -3,16 +3,13 @@ package pl.com.revolut.web;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.log4j.Logger;
-import pl.com.revolut.common.utils.impl.ServiceUtils;
 import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.common.utils.web.WebUtils;
-import pl.com.revolut.exception.PhoneNumberException;
 import pl.com.revolut.impl.CustomerServiceImpl;
 import pl.com.revolut.model.Customer;
-import pl.com.revolut.model.PhoneNumber;
 import pl.com.revolut.model.identifier.CustomerId;
 import pl.com.revolut.service.CustomerService;
 
@@ -22,8 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
 
 @Path("/customers")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -32,7 +27,8 @@ public class CustomerWebService {
     private final CustomerService customerService = CustomerServiceImpl.getCustomerServiceInstance();
     private static final Logger log = Logger.getLogger(AccountWebService.class);
     private Gson gson = new Gson();
-
+    private static final String CUSTOMER_ID_IS_NOT_VALID ="Customer id is not valid";
+    private static final String JSON_IS_NOT_VALID ="Json is not valid";
 
     @GET
     public Response getAllAccounts(){
@@ -44,7 +40,7 @@ public class CustomerWebService {
     @GET
     @Path("/{customerId}")
     public Response getCustomerByCustomerId(@PathParam("customerId") String customerId){
-        Customer customer = null;
+        Customer customer;
         try {
             customer = customerService.getCustomerById(new CustomerId(customerId));
             if(customer == null)
@@ -52,9 +48,9 @@ public class CustomerWebService {
         } catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Customer id con not be null").build();
         }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Customer id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(CUSTOMER_ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
         return Response.ok(gson.toJson(customer)).build();
     }
@@ -62,14 +58,12 @@ public class CustomerWebService {
 
     @POST
     public Response createCustomer(String stringCustomer,@Context UriInfo uriInfo){
-
-        Customer customer = null;
-        URI uri = null;
+        URI uri ;
         try {
             log.info(uriInfo);
-            customer = gson.fromJson(stringCustomer,Customer.class);
+            Customer customer = gson.fromJson(stringCustomer,Customer.class);
             if(customer.getCustomerId() != null)
-                return Response.status(Response.Status.BAD_REQUEST).entity("Customer id must " +
+                return Response.status(Response.Status.NOT_FOUND).entity("Customer id must " +
                         "be null while creating new customer").build();
 
             String customerId = IdGenerator.generateCustomerId();
@@ -80,9 +74,9 @@ public class CustomerWebService {
         }catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Customer model is wrong").build();
         }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Customer id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(CUSTOMER_ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
 
         return Response.created(uri).build();
@@ -92,7 +86,7 @@ public class CustomerWebService {
     @Path("/{customerId}")
     public Response updateCustomer(String stringCustomer,@PathParam("customerId") String customerId){
 
-        Customer customer = null;
+        Customer customer;
 
         try {
             customer = gson.fromJson(stringCustomer,Customer.class);
@@ -109,9 +103,9 @@ public class CustomerWebService {
         }catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Customer model is wrong").build();
         } catch (IdException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Customer id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(CUSTOMER_ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
         return Response.accepted().entity(gson.toJson(customer)).build();
     }
@@ -119,7 +113,7 @@ public class CustomerWebService {
     @DELETE
     @Path("/{customerId}")
     public Response deleteCustomer(@PathParam("customerId") String customerId){
-        Customer customer = null;
+        Customer customer;
         try {
             customer = customerService.removeCustomer(new CustomerId(customerId));
             if(customer == null)
@@ -127,9 +121,9 @@ public class CustomerWebService {
         }catch (NullParameterException e) {
             return Response.serverError().entity("Customer id is null").build();
         } catch (IdException e) {
-            return Response.serverError().entity("Customer id is not valid").build();
+            return Response.serverError().entity(CUSTOMER_ID_IS_NOT_VALID).build();
         }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         } catch (AccountException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
