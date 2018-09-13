@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @see AccountService
+ */
 public class AccountServiceImpl extends StorageService<AccountId,Account> implements AccountService {
     private static AccountService accountServiceInstance = null;
     private CustomerService customerService = null;

@@ -13,11 +13,14 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Bank account of the Customer
+ */
 public class Account {
-    AccountId accountId;
-    Date openDate;
-    BigDecimal currentBalance;
+    AccountId accountId; //Id of the account ,starts with ACC-{id}
+    Date openDate;//open date of the account
+    BigDecimal currentBalance; //current balance of the account
     @NonNull
-    CustomerId customerId;
+    CustomerId customerId;//customer id belongs the owner of the account
 
 }

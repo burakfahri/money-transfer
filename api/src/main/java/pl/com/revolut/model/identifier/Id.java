@@ -3,6 +3,9 @@ package pl.com.revolut.model.identifier;
 import lombok.Data;
 import lombok.NonNull;
 
+/**
+ * Core Id of the classes. It consist of the common mathods of the AccountId, CustomerId and TransactionId
+ */
 @Data
 public abstract class Id {
     protected transient String DASH = "-";
@@ -10,6 +13,9 @@ public abstract class Id {
     String id;
 
     @Override
+    /**
+     * unfortunately lombok does not provide a perfect equals method so i write for the id
+     */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

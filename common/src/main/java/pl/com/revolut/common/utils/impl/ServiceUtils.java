@@ -16,6 +16,11 @@ public final class ServiceUtils {
     private ServiceUtils(){}
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServiceUtils.class);
 
+    /**
+     * check the parametes are null
+     * @param paramters
+     * @throws NullParameterException if the one of the parameter is null
+     */
     public static void  checkParameters(Object ...paramters) throws NullParameterException {
         for (Object parameter : paramters)
             if(parameter == null)
@@ -25,6 +30,15 @@ public final class ServiceUtils {
             }
     }
 
+    /**
+     * create transaction according to its {@param transactionType}
+     * @param amount of the transaction
+     * @param transactionType of the transaction , the method would use for deposit and withdraw transactions
+     * @param accountId of the account
+     * @return the transaction which is created from the operation
+     * @throws NullParameterException if the parameters are null
+     * @throws IdException {@param accountId} is not valid
+     */
     public static Transaction createDepositOrWithDrawTransaction(BigDecimal amount, TransactionType transactionType,
                                                                  AccountId accountId)
             throws NullParameterException, IdException {
@@ -40,6 +54,8 @@ public final class ServiceUtils {
                 transaction.setTransactionType(TransactionType.WITHDRAW);
                 transaction.setReceiverAccountId(accountId);
                 break;
+            default:
+                return null;
         }
         transaction.setTransactionId(new TransactionId(IdGenerator.generateTransactionId()));
         transaction.setAmount(amount);
@@ -47,6 +63,16 @@ public final class ServiceUtils {
         return transaction;
     }
 
+    /**
+     * create transaction according to its {@param transactionType}
+     * @param amount of the transaction from one account to another
+     * @param senderAccountId which belongs to the account of the sender
+     * @param receiverAccountId which belongs to the account of the receiver
+     * @param explanation short description of the transaction (optional)
+     * @return the transaction which type is TRANSFER
+     * @throws NullParameterException if the parameters are null
+     * @throws IdException {@param accountId} is not valid
+     */
     public static Transaction createTransferTransaction(BigDecimal amount, AccountId senderAccountId,
                                                            AccountId receiverAccountId,
                                                            String explanation)

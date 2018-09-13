@@ -6,10 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.com.revolut.exception.PhoneNumberException;
 
+
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
 @ToString
+/**
+ * Phone number of a Customer maybe it's scope can expand when the project become bigger
+ */
 public class PhoneNumber {
     private int area;   // area code (3 digits)
     private int exch;   // exchange  (3 digits)

@@ -119,7 +119,8 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
     }
 
     @Override
-    public Transaction transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl) throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException {
+    public Transaction transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl)
+            throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException {
         Account receiverAccount = checkParametersAndReturnAccount(receiverAccountId,amount);
         Account senderAccount = checkParametersAndReturnAccount(senderAccountId,amount);
 
