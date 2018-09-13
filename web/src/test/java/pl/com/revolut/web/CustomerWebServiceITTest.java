@@ -10,10 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import pl.com.revolut.common.utils.impl.IdGenerator;
-import pl.com.revolut.exception.AccountException;
-import pl.com.revolut.exception.IdException;
-import pl.com.revolut.exception.NullParameterException;
-import pl.com.revolut.exception.PhoneNumberException;
+import pl.com.revolut.exception.*;
 
 import pl.com.revolut.model.Customer;
 import pl.com.revolut.model.identifier.CustomerId;
@@ -30,7 +27,9 @@ import static org.junit.Assert.assertTrue;
 public class CustomerWebServiceITTest extends WebServiceTest{
 
     @Before
-    public void before() throws NullParameterException, AccountException {
+    public void before() throws NullParameterException, AccountException, TransactionException {
+        transactionService.removeAllTransactions();
+        accountService.removeAllAccounts();
         customerService.removeAllCustomers();
     }
 

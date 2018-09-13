@@ -39,8 +39,7 @@ public class AccountWebService {
     @GET
     @Path("/{accountId}")
     public Response getAccountByAccountId(@PathParam("accountId") String accountId){
-        Boolean isIdValid = null;
-        Account account = null;
+        Account account;
         try {
             account = accountService.getAccountById(new AccountId(accountId));
             if(account == null)
@@ -59,11 +58,11 @@ public class AccountWebService {
     @POST
     public Response createAccount(String stringAccount,@Context UriInfo uriInfo){
 
-        Account account = null;
-        URI uri = null;
+        URI uri;
         try {
+
             log.info(uriInfo);
-            account = gson.fromJson(stringAccount,Account.class);
+            Account account = gson.fromJson(stringAccount,Account.class);
             if(account.getAccountId() != null)
                 return Response.status(Response.Status.BAD_REQUEST).entity("Accound id must " +
                         "be null while creating new account").build();
@@ -90,7 +89,7 @@ public class AccountWebService {
     @Path("/{accountId}")
     public Response updateAccount(String stringAccount,@PathParam("accountId") String accountId){
 
-        Account account = null;
+        Account account;
 
         try {
             account = gson.fromJson(stringAccount,Account.class);
