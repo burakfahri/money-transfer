@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * @see CustomerService
+ */
 public class CustomerServiceImpl extends StorageService<CustomerId,Customer> implements CustomerService  {
     private static CustomerService customerServiceInstance = null;
     private Map<CustomerId,List<AccountId>> customerIdToAccountId = new ConcurrentHashMap<>();

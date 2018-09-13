@@ -14,6 +14,9 @@ import pl.com.revolut.service.TransactionService;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * @see TransactionService
+ */
 public class TransactionServiceImpl extends StorageService<TransactionId, Transaction> implements TransactionService {
 
     private static TransactionService transactionServiceInstance = null;

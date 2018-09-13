@@ -17,6 +17,7 @@ import pl.com.revolut.web.TransactionWebService;
 
 
 public class Main {
+
     private static AccountService accountService = null;
     private static TransactionService transactionService = null;
     private static CustomerService customerService = null;
@@ -30,6 +31,9 @@ public class Main {
         log.info("SERVICE HAS BEEN STARTED");
     }
 
+    /**
+     * initiates the services
+     */
     private static void init() {
         accountService = AccountServiceImpl.getAccountServiceInstance();
         transactionService = TransactionServiceImpl.getTransactionServiceInstance();
@@ -39,6 +43,10 @@ public class Main {
         accountService.setCustomerService(customerService);
     }
 
+    /**
+     * start the embeded jetty service
+     * @throws Exception
+     */
     private static void startService() throws Exception {
         Server server = new Server(8080);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
