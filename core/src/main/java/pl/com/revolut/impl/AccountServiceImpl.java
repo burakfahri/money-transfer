@@ -47,10 +47,6 @@ public class AccountServiceImpl extends StorageService<AccountId,Account> implem
     @Override
     public void addOrUpdateAccount(Account account) throws NullParameterException {
         ServiceUtils.checkParameters(account);
-        Account accountOld = super.getItem(account.getAccountId());
-        if(accountOld != null && !accountOld.getCustomerId().equals(account.getCustomerId())) {
-            customerService.removeAccountFromCustomer(accountOld.getCustomerId(),accountOld.getAccountId());
-        }
         customerService.addAccountToCustomer(account.getCustomerId(),account.getAccountId());
         super.addOrUpdateItem(account.getAccountId(),account);
     }
@@ -97,7 +93,7 @@ public class AccountServiceImpl extends StorageService<AccountId,Account> implem
     public List<TransactionId> getTransactionsOfAccount(AccountId accountId) throws NullParameterException, AccountException {
         ServiceUtils.checkParameters(accountId);
         Account account = getAccountById(accountId);
-        if(accountId == null)
+        if(account == null)
             throw new AccountException();
         return accountIdToTransactionId.getOrDefault(accountId,new ArrayList<>());
     }
