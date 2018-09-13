@@ -3,10 +3,7 @@ package pl.com.revolut.web;
 import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -96,20 +93,32 @@ public class WebServiceTest {
         fillHttpRequest(request,entityString);
         return request;
     }
-    public HttpResponse executeHttpGet(URI uri) throws IOException {
-        HttpGet request = new HttpGet();
-        request.setURI(uri);
-        return client.execute(request);
+    public HttpResponse executeHttpRequestBase(URI uri, String methodName) throws IOException {
+        HttpRequestBase httpRequestBase = null;
+        if(methodName.equals(HttpDelete.METHOD_NAME))
+            httpRequestBase = new HttpDelete();
+        else if(methodName.equals(HttpGet.METHOD_NAME))
+            httpRequestBase = new HttpGet();
+        if(httpRequestBase == null)
+            return null;
+        httpRequestBase.setURI(uri);
+        httpRequestBase.setHeader("Content-type", "application/json");
+        return client.execute(httpRequestBase);
     }
 
-    public HttpResponse executeHttpCommand(URI uri,String entityString,String methodName) throws IOException {
+
+    public HttpResponse executeHttpEntityEnclosingRequestBase(URI uri, String entityString, String methodName) throws IOException {
         HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = null;
         if(methodName.equals(HttpPost.METHOD_NAME))
             httpEntityEnclosingRequestBase = createHttpPost(uri,entityString);
         else if(methodName.equals(HttpPut.METHOD_NAME))
             httpEntityEnclosingRequestBase = createHttpPut(uri,entityString);
+        if(httpEntityEnclosingRequestBase == null)
+            return null;
         return client.execute(httpEntityEnclosingRequestBase);
     }
+
+
 
     private void fillHttpRequest(HttpEntityEnclosingRequestBase request, String entityString) throws UnsupportedEncodingException {
         StringEntity entity = new StringEntity(entityString);

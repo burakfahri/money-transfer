@@ -59,21 +59,6 @@ public class CustomerWebService {
         return Response.ok(gson.toJson(customer)).build();
     }
 
-    @POST
-    @Path("/createFakeCustomers")
-    public Response createFakeCustomers(@Context UriInfo uriInfo) {
-        try {
-            addFakeCustomerData();
-        } catch (PhoneNumberException e) {
-            e.printStackTrace();
-        } catch (NullParameterException e) {
-            e.printStackTrace();
-        } catch (IdException e) {
-            e.printStackTrace();
-        }
-        return Response.ok().build();
-    }
-
 
     @POST
     public Response createCustomer(String stringCustomer,@Context UriInfo uriInfo){
@@ -151,30 +136,4 @@ public class CustomerWebService {
         return Response.accepted().entity(gson.toJson(customer)).build();
     }
 
-
-    private void addFakeCustomerData() throws PhoneNumberException, NullParameterException, IdException {
-        Customer customer = new Customer();
-        customer.setCustomerName("burak");
-        customer.setCustomerSurname("cabuk");
-        customer.setCustomerPhone(new PhoneNumber(530,250,400));
-        customer.setCustomerId(new CustomerId(IdGenerator.generateCustomerId()));
-        customer.setAttendDate(Calendar.getInstance().getTime());
-        customerService.addOrUpdateCustomer(customer);
-
-        Customer customer1 = new Customer();
-        customer1.setCustomerName("burak1");
-        customer1.setCustomerSurname("cabuk1");
-        customer1.setCustomerPhone(new PhoneNumber(531,251,401));
-        customer1.setCustomerId(new CustomerId(IdGenerator.generateCustomerId()));
-        customer1.setAttendDate(Calendar.getInstance().getTime());
-        customerService.addOrUpdateCustomer(customer1);
-
-        Customer customer2 = new Customer();
-        customer2.setCustomerName("burak2");
-        customer2.setCustomerSurname("cabuk2");
-        customer2.setCustomerPhone(new PhoneNumber(532,252,402));
-        customer2.setCustomerId(new CustomerId(IdGenerator.generateCustomerId()));
-        customer2.setAttendDate(Calendar.getInstance().getTime());
-        customerService.addOrUpdateCustomer(customer2);
-    }
 }

@@ -1,6 +1,8 @@
 package pl.com.revolut.web;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.util.EntityUtils;
@@ -37,7 +39,7 @@ public class CustomerWebServiceITTest extends WebServiceTest{
         List<Customer> customerList = createMockCustomer(2);
         customerList.forEach(customer -> {
             try {
-                HttpResponse httpResponse = executeHttpCommand(builder.setPath("/customers").build()
+                HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/customers").build()
                         ,gson.toJson(customer),HttpPost.METHOD_NAME);
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 assertTrue(statusCode > 200 && statusCode <300);
@@ -46,7 +48,7 @@ public class CustomerWebServiceITTest extends WebServiceTest{
             }
         });
 
-        HttpResponse response = executeHttpGet(builder.setPath("/customers").build());
+        HttpResponse response = executeHttpRequestBase(builder.setPath("/customers").build(), HttpGet.METHOD_NAME);
         int statusCode = response.getStatusLine().getStatusCode();
 
         assertTrue(statusCode == 200);
@@ -64,7 +66,7 @@ public class CustomerWebServiceITTest extends WebServiceTest{
             try {
                 customer.setCustomerId(customerId);
                 customerService.addOrUpdateCustomer(customer);
-                HttpResponse httpResponse = executeHttpCommand(builder.setPath("/customers/"+customerId.getId()).build()
+                HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/customers/"+customerId.getId()).build()
                         ,gson.toJson(customer),HttpPut.METHOD_NAME);
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 assertTrue(statusCode >= 200 &&  statusCode < 300 );
@@ -75,8 +77,8 @@ public class CustomerWebServiceITTest extends WebServiceTest{
         });
         customerList.forEach(customer -> {
             try {
-                HttpResponse httpResponse = executeHttpGet(builder.setPath("/customers/" + customer.getCustomerId()
-                                .getId()).build());
+                HttpResponse httpResponse = executeHttpRequestBase(builder.setPath("/customers/" + customer.getCustomerId()
+                                .getId()).build(), HttpGet.METHOD_NAME);
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 assertTrue(statusCode == 200);
                 String jsonString = EntityUtils.toString(httpResponse.getEntity());
@@ -86,5 +88,33 @@ public class CustomerWebServiceITTest extends WebServiceTest{
                 e.printStackTrace();
             }
         });
+    }
+
+
+    @Test
+    public void testRemoveCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
+        List<Customer> customerList = createMockCustomer(2);
+        CustomerId customerId = new CustomerId(IdGenerator.generateCustomerId());
+        customerList.forEach(customer -> {
+            try {
+                customer.setCustomerId(customerId);
+                customerService.addOrUpdateCustomer(customer);
+            } catch (NullParameterException e) {
+                e.printStackTrace();
+            }
+        });
+        List<Customer> customerOfServices = customerService.getAllCustomers();
+
+        customerOfServices.forEach(customer -> {
+            try {
+                HttpResponse httpResponse = executeHttpRequestBase(builder.setPath("/customers/"+customerId.getId()).build()
+                        , HttpDelete.METHOD_NAME);
+                assertTrue(httpResponse.getStatusLine().getStatusCode() == 202);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        });
+
+        assertEquals(customerService.getAllCustomers().size(),0);
     }
 }
