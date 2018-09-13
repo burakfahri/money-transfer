@@ -1,10 +1,10 @@
 package pl.com.revolut.web;
 
 import com.google.gson.Gson;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.HttpClientUtils;
@@ -18,7 +18,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.exception.PhoneNumberException;
@@ -27,7 +26,6 @@ import pl.com.revolut.impl.CustomerServiceImpl;
 import pl.com.revolut.impl.TransactionServiceImpl;
 import pl.com.revolut.model.Customer;
 import pl.com.revolut.model.PhoneNumber;
-import pl.com.revolut.model.identifier.CustomerId;
 import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
 import pl.com.revolut.service.TransactionService;
@@ -97,6 +95,11 @@ public class WebServiceTest {
         request.setURI(uri);
         fillHttpRequest(request,entityString);
         return request;
+    }
+    public HttpResponse executeHttpGet(URI uri) throws IOException {
+        HttpGet request = new HttpGet();
+        request.setURI(uri);
+        return client.execute(request);
     }
 
     public HttpResponse executeHttpCommand(URI uri,String entityString,String methodName) throws IOException {

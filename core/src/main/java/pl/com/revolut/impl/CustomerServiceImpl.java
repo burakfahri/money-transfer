@@ -85,4 +85,11 @@ public class CustomerServiceImpl extends StorageService<CustomerId,Customer> imp
         ServiceUtils.checkParameters(customerId);
         return customerIdToAccountId.getOrDefault(customerId,new ArrayList<>());
     }
+
+    @Override
+    public void removeAllCustomers() throws NullParameterException, AccountException {
+        for (Customer customer : super.getAll()) {
+            removeCustomer(customer.getCustomerId());
+        }
+    }
 }

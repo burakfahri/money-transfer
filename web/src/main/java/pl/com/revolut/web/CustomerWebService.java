@@ -122,13 +122,13 @@ public class CustomerWebService {
             customerService.addOrUpdateCustomer(customer);
 
         }catch (NullParameterException e) {
-            return Response.serverError().entity("Customer model is wrong").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Customer model is wrong").build();
         } catch (IdException e) {
-            return Response.serverError().entity("Customer id is not valid").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Customer id is not valid").build();
         }catch (JsonSyntaxException je) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Json is not valid").build();
         }
-        return Response.accepted().entity(customer).build();
+        return Response.accepted().entity(gson.toJson(customer)).build();
     }
 
     @DELETE
@@ -148,7 +148,7 @@ public class CustomerWebService {
         } catch (AccountException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
-        return Response.accepted().entity(customer).build();
+        return Response.accepted().entity(gson.toJson(customer)).build();
     }
 
 

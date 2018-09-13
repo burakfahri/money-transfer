@@ -21,8 +21,6 @@ public abstract class Id {
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        return result;
+        return id.hashCode();
     }
 }

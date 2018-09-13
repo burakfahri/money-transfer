@@ -42,4 +42,6 @@ public interface CustomerService {
 
     List<AccountId> getCustomerAccounts(CustomerId customerId) throws NullParameterException;
 
+    void removeAllCustomers() throws NullParameterException, AccountException;
+
 }
