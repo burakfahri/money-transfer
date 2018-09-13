@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 
-@EqualsAndHashCode
 public class CustomerId extends Id {
     private transient final String CUSTOMER_ID_PREFIX = "CUS";
 

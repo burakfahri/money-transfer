@@ -1,3 +1,5 @@
+package pl.com.revolut.impl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -18,10 +20,10 @@ import java.util.Calendar;
 import java.util.List;
 
 public class CustomerServiceImplTest {
-    private List<Customer> customerList = new ArrayList<>();
-    private CustomerService customerService = null;
+    public static List<Customer> customerList = new ArrayList<>();
+    private static CustomerService customerService = null;
 
-    private List<Customer> createMockCustomer(int count) throws PhoneNumberException, NullParameterException, IdException{
+    public static List<Customer> createMockCustomer(int count) throws PhoneNumberException, NullParameterException, IdException{
         if(count > 499)
             count = 499;
         for (int i = 0 ;i< count;i ++) {
@@ -39,28 +41,35 @@ public class CustomerServiceImplTest {
 
     }
 
+    public static void setCustomerService(CustomerService customerServiceP)
+    {
+        customerService = customerServiceP;
+    }
+
     @Before
     public void setup() throws PhoneNumberException, NullParameterException, IdException {
-        customerService = CustomerServiceImpl.getCustomerServiceInstance();
+        setCustomerService(CustomerServiceImpl.getCustomerServiceInstance());
+        customerList.clear();
     }
 
     @Test
-    public void addOrUpdateCustomerTest() throws PhoneNumberException, IdException, NullParameterException {
+    public void addOrUpdateCustomerTest() throws PhoneNumberException, IdException, NullParameterException, AccountException {
 
         //ADD CUSTOMER
         List<Customer> customers = createMockCustomer(1);
         customerService.addOrUpdateCustomer(customers.get(0));
-        List<Customer>customerList = customerService.getAllCustomers();
-        Assertions.assertEquals(customerList,customers);
+        Customer customer = customerService.getCustomerById(customers.get(0).getCustomerId());
+        Assertions.assertTrue(customerList.contains(customer));
 
 
         //UPDATE CUSTOMER
-        Customer customer = customers.get(0);
         customer.setCustomerSurname("FF");
 
         customerService.addOrUpdateCustomer(customer);
-        customerList = customerService.getAllCustomers();
-        Assertions.assertEquals(customerList,customers);
+        Customer customer1 = customerService.getCustomerById(customers.get(0).getCustomerId());
+
+        Assertions.assertEquals("FF",customer1.getCustomerSurname());
+        customerService.removeCustomer(customers.get(0).getCustomerId());
 
     }
 
@@ -68,12 +77,10 @@ public class CustomerServiceImplTest {
     @Test
     public void removeCustomer() throws PhoneNumberException, IdException, NullParameterException, AccountException {
 
-
         List<Customer> customers = createMockCustomer(1);
         customerService.addOrUpdateCustomer(customers.get(0));
-        Assertions.assertEquals(customerService.getAllCustomers().size(), 1);
+        Assertions.assertEquals(customerService.getCustomerById(customers.get(0).getCustomerId()), customers.get(0));
         customerService.removeCustomer(customers.get(0).getCustomerId());
-        Assertions.assertEquals(customerService.getAllCustomers().size(), 0);
         List<Customer> customerList1 = customerService.getAllCustomers();
         Assertions.assertNotEquals(customerList1,customers);
     }

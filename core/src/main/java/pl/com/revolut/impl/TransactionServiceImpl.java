@@ -44,10 +44,6 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
         super.addOrUpdateItem(transaction.getTransactionId(), transaction);
     }
 
-    public Boolean removeTransaction(TransactionId transactionId) throws NullParameterException {
-        ServiceUtils.checkParameters(transactionId);
-        return super.remove(transactionId) != null;
-    }
 
     @Override
     public Transaction getTransactionById(TransactionId transactionId) throws NullParameterException {
@@ -77,7 +73,7 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
 
         Transaction transaction = ServiceUtils.createDepositOrWithDrawTransaction(amount, TransactionType.DEPOSIT,accountId);
 
-        addMoneyFromTheAccount(account,transaction.getTransactionId(),account.getCurrentBalance().add(amount));
+        addMoneyFromTheAccount(account,transaction.getTransactionId(),amount);
 
         addOrUpdateTransaction(transaction);
         return transaction;

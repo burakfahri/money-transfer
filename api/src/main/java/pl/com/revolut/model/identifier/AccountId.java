@@ -1,10 +1,9 @@
 package pl.com.revolut.model.identifier;
 
-import lombok.EqualsAndHashCode;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 
-@EqualsAndHashCode
+
 public class AccountId extends Id {
     private transient final String ACCOUNT_ID_PREFIX = "ACC";
 
@@ -21,4 +20,5 @@ public class AccountId extends Id {
         String[] splittedId = accountId.split(DASH);
         return  (splittedId.length == 2) && splittedId[0].equals(ACCOUNT_ID_PREFIX) && splittedId[1].chars().allMatch(Character::isDigit);
     }
+
 }

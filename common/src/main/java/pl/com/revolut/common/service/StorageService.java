@@ -29,6 +29,7 @@ public abstract class StorageService<K,V> {
 
     protected final void addOrUpdateItem(final K key, final V value) throws NullParameterException {
         ServiceUtils.checkParameters(key,value);
+
         map.put(key,value);
     }
 
