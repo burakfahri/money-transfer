@@ -58,4 +58,6 @@ public interface TransactionService {
     Transaction transfer(AccountId senderAccountId, AccountId receiverAccountId, BigDecimal amount,String expl)
             throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException;
 
+    void removeAllTransactions() throws NullParameterException, TransactionException;
+
 }

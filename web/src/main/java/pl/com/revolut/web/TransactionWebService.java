@@ -77,18 +77,18 @@ public class TransactionWebService {
                 return Response.status(Response.Status.NOT_FOUND).entity("Account id does not exist").build();
 
             List<TransactionId> transactionIdList = accountService.getTransactionsOfAccount(accountId);
-            List<Transaction> transactions = new ArrayList<>();
+            List<Transaction> transactionList = new ArrayList<>();
             
             for (TransactionId transactionId : transactionIdList) {
                 try {
                     Transaction transaction = transactionService.getTransactionById(transactionId);
-                    transactions.add(transaction);
+                    transactionList.add(transaction);
                 } catch (NullParameterException e) {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("There is an error while " +
                             "fetching the transaction of transactionId = " + transactionId).build();
                 }
             }
-            transactionJsonList = gson.toJson(transactions);
+            transactionJsonList = gson.toJson(transactionList);
         } catch (NullParameterException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Account id can not be null").build();
         } catch (IdException | AccountException e) {
@@ -177,7 +177,7 @@ public class TransactionWebService {
 
     @POST
     @Path("/transfer/from/{senderAccountId}/to/{receiverAccountId}/amount/{amount}/comment/{comment}")
-    public Response deposit(@PathParam("senderAccountId") String senderAccountId,@PathParam("receiverAccountId")
+    public Response transfer(@PathParam("senderAccountId") String senderAccountId,@PathParam("receiverAccountId")
             String receiverAccountId ,@PathParam("amount") BigDecimal amount,@PathParam("comment") String comment){
         String transactionJson = null;
         try {

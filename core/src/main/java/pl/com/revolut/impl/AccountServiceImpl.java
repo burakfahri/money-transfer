@@ -57,6 +57,8 @@ public class AccountServiceImpl extends StorageService<AccountId,Account> implem
         Account account = super.getItem(accountId);
         if(account == null)
             throw new AccountException();
+
+        accountIdToTransactionId.remove(accountId);
         customerService.removeAccountFromCustomer(account.getCustomerId(),account.getAccountId());
         return super.remove(accountId);
     }
@@ -96,5 +98,12 @@ public class AccountServiceImpl extends StorageService<AccountId,Account> implem
         if(account == null)
             throw new AccountException();
         return accountIdToTransactionId.getOrDefault(accountId,new ArrayList<>());
+    }
+
+    @Override
+    public void removeAllAccounts() throws NullParameterException, AccountException {
+        for (Account account : super.getAll()) {
+            removeAccount(account.getAccountId());
+        }
     }
 }

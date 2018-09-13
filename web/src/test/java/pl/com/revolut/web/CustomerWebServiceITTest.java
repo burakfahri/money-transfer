@@ -36,7 +36,7 @@ public class CustomerWebServiceITTest extends WebServiceTest{
 
     @Test
     public void testAddFetchAllCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
-        List<Customer> customerList = createMockCustomer(2);
+        List<Customer> customerList = createMockCustomerList(2);
         customerList.forEach(customer -> {
             try {
                 HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/customers").build()
@@ -60,7 +60,7 @@ public class CustomerWebServiceITTest extends WebServiceTest{
 
     @Test
     public void testUpdateAndGetByIdCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
-        List<Customer> customerList = createMockCustomer(2);
+        List<Customer> customerList = createMockCustomerList(2);
         CustomerId customerId = new CustomerId(IdGenerator.generateCustomerId());
         customerList.forEach(customer -> {
             try {
@@ -93,7 +93,7 @@ public class CustomerWebServiceITTest extends WebServiceTest{
 
     @Test
     public void testRemoveCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
-        List<Customer> customerList = createMockCustomer(2);
+        List<Customer> customerList = createMockCustomerList(2);
         CustomerId customerId = new CustomerId(IdGenerator.generateCustomerId());
         customerList.forEach(customer -> {
             try {

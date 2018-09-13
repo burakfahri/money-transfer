@@ -15,23 +15,29 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.exception.PhoneNumberException;
 import pl.com.revolut.impl.AccountServiceImpl;
 import pl.com.revolut.impl.CustomerServiceImpl;
 import pl.com.revolut.impl.TransactionServiceImpl;
+import pl.com.revolut.model.Account;
 import pl.com.revolut.model.Customer;
 import pl.com.revolut.model.PhoneNumber;
+import pl.com.revolut.model.identifier.AccountId;
+import pl.com.revolut.model.identifier.CustomerId;
 import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
 import pl.com.revolut.service.TransactionService;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class WebServiceTest {
@@ -61,11 +67,11 @@ public class WebServiceTest {
 
     @AfterClass
     public static void closeClient() throws Exception{
-        server.stop();
+        //server.stop();
         HttpClientUtils.closeQuietly(client);
     }
 
-    public static List<Customer> createMockCustomer(int count) throws PhoneNumberException, NullParameterException, IdException {
+    public  List<Customer> createMockCustomerList(int count) throws PhoneNumberException, NullParameterException, IdException {
         if(count > 499)
             count = 499;
         List<Customer> customerList = new ArrayList<>();
@@ -78,6 +84,36 @@ public class WebServiceTest {
             customerList.add(customer);
         }
         return customerList;
+    }
+
+
+    public  List<Account> createMockAccountList(int count) throws PhoneNumberException, NullParameterException, IdException {
+        List<Customer> customerList = createMockCustomerList(1);
+        List<Account> accountList = new ArrayList<>();
+
+        for (Customer customer: customerList) {
+            customer.setCustomerId(new CustomerId(IdGenerator.generateCustomerId()));
+            customerService.addOrUpdateCustomer(customer);
+        }
+
+        for (int i = 0 ;i< count;i ++) {
+            Account account = new Account();
+            account.setCurrentBalance(new BigDecimal(100.0));
+            account.setCustomerId(customerList.get(0).getCustomerId());
+            account.setOpenDate(new Date());
+            accountList.add(account);
+
+        }
+        return accountList;
+    }
+
+    public List<Account> createMockAccountListForTransaction(int count) throws PhoneNumberException, IdException, NullParameterException {
+        List<Account> accountList = createMockAccountList(count);
+        for (Account account: accountList) {
+            account.setAccountId(new AccountId(IdGenerator.generateAccountId()));
+            accountService.addOrUpdateAccount(account);
+        }
+        return  accountList;
     }
 
     private HttpPost createHttpPost(URI uri,String entityString) throws UnsupportedEncodingException {
@@ -121,9 +157,11 @@ public class WebServiceTest {
 
 
     private void fillHttpRequest(HttpEntityEnclosingRequestBase request, String entityString) throws UnsupportedEncodingException {
-        StringEntity entity = new StringEntity(entityString);
+        if(entityString != null) {
+            StringEntity entity = new StringEntity(entityString);
+            request.setEntity(entity);
+        }
         request.setHeader("Content-type", "application/json");
-        request.setEntity(entity);
     }
 
     private static void init() {

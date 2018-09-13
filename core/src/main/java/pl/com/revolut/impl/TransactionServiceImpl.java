@@ -133,4 +133,24 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
 
         return transaction;
     }
+
+    public void removeTransaction(TransactionId transactionId) throws NullParameterException, TransactionException {
+        if (transactionId == null)
+            throw new NullParameterException();
+        Transaction transaction = getTransactionById(transactionId);
+        if(transaction == null)
+            throw new TransactionException();
+        if(transaction.getReceiverAccountId() != null)
+            accountServiceInstance.removeTransactionFromAccount(transactionId,transaction.getReceiverAccountId());
+        if(transaction.getSenderAccountId() != null)
+            accountServiceInstance.removeTransactionFromAccount(transactionId,transaction.getSenderAccountId());
+        super.remove(transactionId);
+    }
+
+    @Override
+    public void removeAllTransactions() throws NullParameterException, TransactionException {
+        for (Transaction transaction : super.getAll()) {
+            removeTransaction(transaction.getTransactionId());
+        }
+    }
 }

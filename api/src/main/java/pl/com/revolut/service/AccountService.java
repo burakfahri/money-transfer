@@ -48,4 +48,5 @@ public interface AccountService {
 
     List<TransactionId> getTransactionsOfAccount(AccountId accountId) throws NullParameterException, AccountException;
 
+    void removeAllAccounts() throws NullParameterException, AccountException;
 }

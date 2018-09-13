@@ -4,15 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import pl.com.revolut.common.utils.impl.IdGenerator;
-import pl.com.revolut.exception.AccountException;
-import pl.com.revolut.exception.IdException;
-import pl.com.revolut.exception.NullParameterException;
-import pl.com.revolut.exception.PhoneNumberException;
+import pl.com.revolut.exception.*;
 import pl.com.revolut.model.Account;
 import pl.com.revolut.model.identifier.AccountId;
 import pl.com.revolut.model.identifier.TransactionId;
 import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
+import pl.com.revolut.service.TransactionService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,6 +21,7 @@ public class AccountServiceImplTest {
     public static List<Account> accountList = new ArrayList<>();
     private static CustomerService customerService = null;
     private AccountService accountService = null;
+    private TransactionService transactionService = null;
 
     public static List<Account> createMockAccount(int count) throws NullParameterException, IdException, PhoneNumberException {
         CustomerServiceImplTest.createMockCustomer(1);
@@ -43,13 +42,16 @@ public class AccountServiceImplTest {
     }
 
     @Before
-    public void setup() throws PhoneNumberException, NullParameterException, IdException {
+    public void setup() throws PhoneNumberException, NullParameterException, IdException, AccountException, TransactionException {
         customerService = CustomerServiceImpl.getCustomerServiceInstance();
         accountService = AccountServiceImpl.getAccountServiceInstance();
+        transactionService = TransactionServiceImpl.getTransactionServiceInstance();
         accountService.setCustomerService(customerService);
         CustomerServiceImplTest.setCustomerService(customerService);
+        transactionService.setAccountService(accountService);
         AccountServiceImplTest.accountList.clear();
-
+        transactionService.removeAllTransactions();
+        accountService.removeAllAccounts();
     }
 
     @Test
@@ -118,6 +120,7 @@ public class AccountServiceImplTest {
         List<TransactionId> transactionIds = accountService.getTransactionsOfAccount(accounts.get(0).getAccountId());
         Assertions.assertEquals(transactionIds.get(0),transactionId);
         accountService.removeAccount(accounts.get(0).getAccountId());
+
 
     }
 
