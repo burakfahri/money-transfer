@@ -19,7 +19,7 @@ java -jar ~/.m2/repository/pl/com/revolut/money-transfer-main/1.0/money-transfer
 ```
 ./logs/money-transfer
 ```
-##architecture
+## architecture
 ![model architecture](/docs/model.png)
 ### Available Customer Services
 
@@ -63,7 +63,7 @@ java -jar ~/.m2/repository/pl/com/revolut/money-transfer-main/1.0/money-transfer
 ## Sample Jsons
 ___
 
-###customer
+### customer
 ```
 {
   "customerName": "name",
@@ -75,7 +75,7 @@ ___
   }
 }
 ```
-###account
+### account
 ```
 {
   "openDate": "Sep 10, 2018 6:24:55 PM",
@@ -85,7 +85,7 @@ ___
   }
 }
 ```
-###transaction
+### transaction
 ```
 {
   "senderCustomerId": {
