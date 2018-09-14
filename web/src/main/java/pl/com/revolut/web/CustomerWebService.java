@@ -31,7 +31,7 @@ public class CustomerWebService {
     private static final String JSON_IS_NOT_VALID ="Json is not valid";
 
     @GET
-    public Response getAllAccounts(){
+    public Response getAllCustomers(){
         String customerListJson = gson.toJson(customerService.getAllCustomers());
         log.debug(customerListJson);
         return Response.ok(customerListJson).build();

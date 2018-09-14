@@ -19,14 +19,8 @@ java -jar ~/.m2/repository/pl/com/revolut/money-transfer-main/1.0/money-transfer
 ```
 ./logs/money-transfer
 ```
-### Links
-
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
-
+##architecture
+![model architecture](/docs/model.png)
 ### Available Customer Services
 
 | HTTP METHOD | PATH | USAGE |
@@ -66,7 +60,8 @@ Give examples
 - 404 Not Found: The requested resource cannot be found
 - 500 Internal Server Error: The server encountered an unexpected condition 
 
-### Sample Jsons
+## Sample Jsons
+___
 
 ###customer
 ```
