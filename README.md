@@ -55,7 +55,7 @@ java -jar ~/.m2/repository/pl/com/revolut/money-transfer-main/1.0/money-transfer
 
 ### Http Status
 - 200 OK: The request has succeeded
-- 201 Crated: The request has created
+- 201 Created: The request has created
 - 400 Bad Request: The request could not be understood by the server 
 - 404 Not Found: The requested resource cannot be found
 - 500 Internal Server Error: The server encountered an unexpected condition 
