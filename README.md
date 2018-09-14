@@ -61,15 +61,14 @@ Give examples
 
 ### Http Status
 - 200 OK: The request has succeeded
-- 201 OK: The request has created
-- 202 OK: The request has accepted
+- 201 Crated: The request has created
 - 400 Bad Request: The request could not be understood by the server 
 - 404 Not Found: The requested resource cannot be found
 - 500 Internal Server Error: The server encountered an unexpected condition 
 
 ### Sample Jsons
 
-####customer
+###customer
 ```
 {
   "customerName": "name",
@@ -81,7 +80,7 @@ Give examples
   }
 }
 ```
-####account
+###account
 ```
 {
   "openDate": "Sep 10, 2018 6:24:55 PM",
@@ -91,7 +90,7 @@ Give examples
   }
 }
 ```
-####transaction
+###transaction
 ```
 {
   "senderCustomerId": {

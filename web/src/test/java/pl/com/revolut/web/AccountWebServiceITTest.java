@@ -105,7 +105,7 @@ public class AccountWebServiceITTest extends WebServiceTest{
                             account.getAccountId().getId(), gson.toJson(account), HttpPut.METHOD_NAME);
 
             int statusCode = httpResponse.getStatusLine().getStatusCode();
-            assertTrue(statusCode == Response.Status.ACCEPTED.getStatusCode());
+            assertTrue(statusCode == Response.Status.OK.getStatusCode());
         }
 
 
