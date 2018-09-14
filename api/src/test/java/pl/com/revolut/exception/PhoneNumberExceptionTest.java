@@ -8,10 +8,6 @@ import org.junit.Test;
 import pl.pojo.tester.api.assertion.Assertions;
 import pl.pojo.tester.api.assertion.Method;
 
-/**
- * @author resulav
- *
- */
 public class PhoneNumberExceptionTest {
 
 

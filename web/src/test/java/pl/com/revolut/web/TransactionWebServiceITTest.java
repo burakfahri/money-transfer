@@ -41,12 +41,12 @@ public class TransactionWebServiceITTest extends WebServiceTest{
     public void testDeposit() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
        List<Account> mockAccountList = createMockAccountListForTransaction(1);
        Account mockAccount = mockAccountList.get(0);
-       HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/transactions/account/"+
-               mockAccount.getAccountId().getId()+"/deposit/100").build(),null, HttpPost.METHOD_NAME);
+       HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase("/transactions/account/"+
+               mockAccount.getAccountId().getId()+"/deposit/100",null, HttpPost.METHOD_NAME);
        assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
 
-       httpResponse = executeHttpRequestBase(builder.setPath("/transactions/account/"+
-               mockAccount.getAccountId().getId()).build(),HttpGet.METHOD_NAME);
+       httpResponse = executeHttpRequestBase("/transactions/account/"+
+               mockAccount.getAccountId().getId(),HttpGet.METHOD_NAME);
         assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
         String jsonString = EntityUtils.toString(httpResponse.getEntity());
         List<Transaction> transactionList = (ArrayList<Transaction>) gson.fromJson(jsonString,new TypeToken<ArrayList<Transaction>>(){}.getType());
@@ -60,13 +60,13 @@ public class TransactionWebServiceITTest extends WebServiceTest{
     public void testWithDraw() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
         List<Account> mockAccountList = createMockAccountListForTransaction(1);
         Account mockAccount = mockAccountList.get(0);
-        HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/transactions/account/"+
-                mockAccount.getAccountId().getId()+"/withdraw/100").build(),null, HttpPost.METHOD_NAME);
+        HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase("/transactions/account/"+
+                mockAccount.getAccountId().getId()+"/withdraw/100",null, HttpPost.METHOD_NAME);
         assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
 
 
-        httpResponse = executeHttpRequestBase(builder.setPath("/transactions/customer/"+
-                customerService.getAllCustomers().get(0).getCustomerId().getId()).build(),HttpGet.METHOD_NAME);
+        httpResponse = executeHttpRequestBase("/transactions/customer/"+
+                customerService.getAllCustomers().get(0).getCustomerId().getId(),HttpGet.METHOD_NAME);
         assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
         String jsonString = EntityUtils.toString(httpResponse.getEntity());
         List<Transaction> transactionList = (ArrayList<Transaction>) gson.fromJson(jsonString,new TypeToken<ArrayList<Transaction>>(){}.getType());
@@ -81,14 +81,14 @@ public class TransactionWebServiceITTest extends WebServiceTest{
         List<Account> mockAccountList = createMockAccountListForTransaction(2);
         Account mockSenderAccount = mockAccountList.get(0);
         Account mockReceiverAccount = mockAccountList.get(0);
-        HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/transactions/transfer/from/"+
+        HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase("/transactions/transfer/from/"+
                 mockSenderAccount.getAccountId().getId()+"/to/"+
                         mockReceiverAccount.getAccountId().getId()+
-                "/amount/100/comment/EXPL1").build(),null, HttpPost.METHOD_NAME);
+                "/amount/100/comment/EXPL1",null, HttpPost.METHOD_NAME);
         assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
 
 
-        httpResponse = executeHttpRequestBase(builder.setPath("/transactions").build(),HttpGet.METHOD_NAME);
+        httpResponse = executeHttpRequestBase("/transactions",HttpGet.METHOD_NAME);
         assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
         String jsonString = EntityUtils.toString(httpResponse.getEntity());
         List<Transaction> transactionList = (ArrayList<Transaction>) gson.fromJson(jsonString,new TypeToken<ArrayList<Transaction>>(){}.getType());
@@ -100,7 +100,7 @@ public class TransactionWebServiceITTest extends WebServiceTest{
         assertEquals(transactionList.get(0).getReceiverAccountId(), mockReceiverAccount.getAccountId());
 
 
-        httpResponse = executeHttpRequestBase(builder.setPath("/transactions/"+ transactionList.get(0).getTransactionId().getId()).build(),HttpGet.METHOD_NAME);
+        httpResponse = executeHttpRequestBase("/transactions/"+ transactionList.get(0).getTransactionId().getId(),HttpGet.METHOD_NAME);
         assertEquals(httpResponse.getStatusLine().getStatusCode() , 200);
         jsonString = EntityUtils.toString(httpResponse.getEntity());
         Transaction transaction = (Transaction) gson.fromJson(jsonString,Transaction.class);

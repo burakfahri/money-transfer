@@ -107,7 +107,7 @@ public class CustomerWebService {
         }catch (JsonSyntaxException je) {
             return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
-        return Response.accepted().entity(gson.toJson(customer)).build();
+        return Response.ok().entity(gson.toJson(customer)).build();
     }
 
     @DELETE
@@ -127,7 +127,7 @@ public class CustomerWebService {
         } catch (AccountException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
-        return Response.accepted().entity(gson.toJson(customer)).build();
+        return Response.ok().entity(gson.toJson(customer)).build();
     }
 
 }

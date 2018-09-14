@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -129,7 +130,7 @@ public class WebServiceTest {
         fillHttpRequest(request,entityString);
         return request;
     }
-    public HttpResponse executeHttpRequestBase(URI uri, String methodName) throws IOException {
+    public HttpResponse executeHttpRequestBase(String uriStr, String methodName) throws IOException, URISyntaxException {
         HttpRequestBase httpRequestBase = null;
         if(methodName.equals(HttpDelete.METHOD_NAME))
             httpRequestBase = new HttpDelete();
@@ -137,14 +138,16 @@ public class WebServiceTest {
             httpRequestBase = new HttpGet();
         if(httpRequestBase == null)
             return null;
+        URI uri = builder.setPath(uriStr).build();
         httpRequestBase.setURI(uri);
         httpRequestBase.setHeader("Content-type", "application/json");
         return client.execute(httpRequestBase);
     }
 
 
-    public HttpResponse executeHttpEntityEnclosingRequestBase(URI uri, String entityString, String methodName) throws IOException {
+    public HttpResponse executeHttpEntityEnclosingRequestBase(String uriStr, String entityString, String methodName) throws IOException, URISyntaxException {
         HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = null;
+        URI uri = builder.setPath(uriStr).build();
         if(methodName.equals(HttpPost.METHOD_NAME))
             httpEntityEnclosingRequestBase = createHttpPost(uri,entityString);
         else if(methodName.equals(HttpPut.METHOD_NAME))
