@@ -101,3 +101,35 @@ ___
   "TransactionType": "TRANSFER"
 }
 ```
+
+### example posts via curl
+
+```
+GET CUSTOMERS
+curl -H "Content-Type:application/json" -X GET http://localhost:8080/customers | python -m json.tool
+
+POST CUSTOMERS
+curl -H "Content-Type:application/json" -X POST -d @customerEvent.json http://localhost:8080/customers
+
+QUERY CUSTOMERS
+curl -H "Content-Type:application/json" -X GET http://localhost:8080/customers/{CUS-1}
+
+POST ACCOUNTS
+curl -H "Content-Type:application/json" -X POST -d @accountEvent.json http://localhost:8080/accounts
+
+GET ACCOUNTS
+curl -H "Content-Type:application/json" -X GET http://localhost:8080/accounts | python -m json.tool
+
+QUERY ACCOUNTS
+curl -H "Content-Type:application/json" -X GET http://localhost:8080/accounts/{ACC-1}
+
+WITHDRAW ACCOUNTS
+curl -H "Content-Type:application/json" -X POST http://localhost:8080/transactions/account/{ACC-1}/withdraw/{amount}
+
+DEPOSIT ACCOUNTS
+curl -H "Content-Type:application/json" -X POST http://localhost:8080/transactions/account/{ACC-1}/deposit/{amount}
+
+TRANSFER ACCOUNTS
+curl -H "Content-Type:application/json" -X POST http://localhost:8080/transactions/transfer/from/{ACC-1}/to/{ACC-2}/amount/{amount}/comment/exmp
+
+```

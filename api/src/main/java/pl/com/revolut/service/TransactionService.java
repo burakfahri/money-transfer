@@ -14,7 +14,7 @@ public interface TransactionService {
      * Account service must use when transaction issues.
      * @param accountService using for injection
      */
-    void setAccountService(AccountService accountService);
+    void setAccountService(AccountService accountService) throws NullParameterException;
 
     /**
      *

@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
+import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.impl.AccountServiceImpl;
 import pl.com.revolut.impl.CustomerServiceImpl;
 import pl.com.revolut.impl.TransactionServiceImpl;
@@ -23,17 +24,22 @@ public class Main {
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Main.class);
 
 
-    public static void main(String[] args) throws Exception {
-        init();
-        log.info("PROGRAM HAS BEEN STARTED");
-        startService();
-        log.info("SERVICE HAS BEEN STARTED");
+    public static void main(String[] args) {
+        try {
+
+            init();
+            log.info("PROGRAM HAS BEEN STARTED");
+            startService();
+            log.info("SERVICE HAS BEEN STARTED");
+        } catch (NullParameterException e) {
+            log.error(e.getMessage());
+        }
     }
 
     /**
      * initiates the services
      */
-    private static void init() {
+    private static void init() throws NullParameterException {
         accountService = AccountServiceImpl.getAccountServiceInstance();
         transactionService = TransactionServiceImpl.getTransactionServiceInstance();
         customerService = CustomerServiceImpl.getCustomerServiceInstance();
@@ -46,7 +52,7 @@ public class Main {
      * start the embeded jetty service
      * @throws Exception
      */
-    private static void startService() throws Exception {
+    private static void startService() {
         Server server = new Server(8080);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");

@@ -167,7 +167,7 @@ public class WebServiceTest {
         request.setHeader("Content-type", "application/json");
     }
 
-    private static void init() {
+    private static void init() throws NullParameterException {
         accountService = AccountServiceImpl.getAccountServiceInstance();
         transactionService = TransactionServiceImpl.getTransactionServiceInstance();
         customerService = CustomerServiceImpl.getCustomerServiceInstance();
