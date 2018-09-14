@@ -116,7 +116,8 @@ public class AccountWebService {
         }catch (JsonSyntaxException je) {
             return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
         }
-        return Response.accepted().entity(account).build();
+
+        return Response.ok().entity(gson.toJson(account)).build();
     }
 
     @DELETE

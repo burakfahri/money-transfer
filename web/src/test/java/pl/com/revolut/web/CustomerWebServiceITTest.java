@@ -36,18 +36,15 @@ public class CustomerWebServiceITTest extends WebServiceTest{
     @Test
     public void testAddFetchAllCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
         List<Customer> customerList = createMockCustomerList(2);
-        customerList.forEach(customer -> {
-            try {
-                HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/customers").build()
-                        ,gson.toJson(customer),HttpPost.METHOD_NAME);
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                assertTrue(statusCode > 200 && statusCode <300);
-            } catch (URISyntaxException  | IOException e) {
-                e.printStackTrace();
-            }
-        });
+        for (Customer customer : customerList) {
+            HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase("/customers"
+                    ,gson.toJson(customer),HttpPost.METHOD_NAME);
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            assertTrue(statusCode > 200 && statusCode <300);
 
-        HttpResponse response = executeHttpRequestBase(builder.setPath("/customers").build(), HttpGet.METHOD_NAME);
+        }
+
+        HttpResponse response = executeHttpRequestBase("/customers", HttpGet.METHOD_NAME);
         int statusCode = response.getStatusLine().getStatusCode();
 
         assertTrue(statusCode == 200);
@@ -61,59 +58,41 @@ public class CustomerWebServiceITTest extends WebServiceTest{
     public void testUpdateAndGetByIdCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
         List<Customer> customerList = createMockCustomerList(2);
         CustomerId customerId = new CustomerId(IdGenerator.generateCustomerId());
-        customerList.forEach(customer -> {
-            try {
-                customer.setCustomerId(customerId);
-                customerService.addOrUpdateCustomer(customer);
-                HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase(builder.setPath("/customers/"+customerId.getId()).build()
-                        ,gson.toJson(customer),HttpPut.METHOD_NAME);
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                assertTrue(statusCode >= 200 &&  statusCode < 300 );
+        for (Customer customer : customerList) {
+            //add customer
+            customer.setCustomerId(customerId);
+            customerService.addOrUpdateCustomer(customer);
+            HttpResponse httpResponse = executeHttpEntityEnclosingRequestBase("/customers/"+customerId.getId()
+                    ,gson.toJson(customer),HttpPut.METHOD_NAME);
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            assertTrue(statusCode >= 200 &&  statusCode < 300 );
 
-            } catch (URISyntaxException  | IOException  | NullParameterException e) {
-                e.printStackTrace();
-            }
-        });
-        customerList.forEach(customer -> {
-            try {
-                HttpResponse httpResponse = executeHttpRequestBase(builder.setPath("/customers/" + customer.getCustomerId()
-                                .getId()).build(), HttpGet.METHOD_NAME);
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                assertTrue(statusCode == 200);
-                String jsonString = EntityUtils.toString(httpResponse.getEntity());
-                Customer customer1 = gson.fromJson(jsonString, Customer.class);
-                Assertions.assertNotEquals(customer1, customer);
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        });
+            //check customer id
+            httpResponse = executeHttpRequestBase("/customers/" + customer.getCustomerId()
+                    .getId(), HttpGet.METHOD_NAME);
+            statusCode = httpResponse.getStatusLine().getStatusCode();
+            assertTrue(statusCode == 200);
+            String jsonString = EntityUtils.toString(httpResponse.getEntity());
+            Customer customer1 = gson.fromJson(jsonString, Customer.class);
+            Assertions.assertNotEquals(customer1, customer);
+        }
     }
 
 
     @Test
     public void testRemoveCustomers() throws URISyntaxException, IOException, PhoneNumberException, IdException, NullParameterException {
         List<Customer> customerList = createMockCustomerList(2);
-        CustomerId customerId = new CustomerId(IdGenerator.generateCustomerId());
-        customerList.forEach(customer -> {
-            try {
-                customer.setCustomerId(customerId);
-                customerService.addOrUpdateCustomer(customer);
-            } catch (NullParameterException e) {
-                e.printStackTrace();
-            }
-        });
+        for (Customer customer : customerList) {
+            CustomerId customerId = new CustomerId(IdGenerator.generateCustomerId());
+            customer.setCustomerId(customerId);
+            customerService.addOrUpdateCustomer(customer);
+        }
         List<Customer> customerOfServices = customerService.getAllCustomers();
 
-        customerOfServices.forEach(customer -> {
-            try {
-                HttpResponse httpResponse = executeHttpRequestBase(builder.setPath("/customers/"+customerId.getId()).build()
-                        , HttpDelete.METHOD_NAME);
-                assertTrue(httpResponse.getStatusLine().getStatusCode() == 202);
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        });
-
-        assertEquals(customerService.getAllCustomers().size(),0);
+        for (Customer customer : customerOfServices) {
+            HttpResponse httpResponse = executeHttpRequestBase("/customers/"+customer.getCustomerId().getId()
+                    , HttpDelete.METHOD_NAME);
+            assertTrue(httpResponse.getStatusLine().getStatusCode() == 200);
+        }
     }
 }

@@ -26,6 +26,7 @@ public interface AccountService {
      * @param account which will add or update on the store
      * @throws NullParameterException if the parameters are null
      */
+
     void addOrUpdateAccount(Account account) throws NullParameterException;
 
 
@@ -36,6 +37,7 @@ public interface AccountService {
      * @throws NullParameterException if the parameters are null
      * @throws AccountException if the {@param accountId} does not belongs to any account
      */
+
     Account removeAccount(AccountId accountId) throws NullParameterException, AccountException;
 
     /**
