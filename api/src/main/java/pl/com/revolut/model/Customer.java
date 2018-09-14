@@ -21,9 +21,9 @@ import java.util.Date;
  * customer is a person who can open a accounts and make transactions
  */
 public class Customer {
-    CustomerId customerId;//id of the customer
-    String customerName;//name of the customer
-    String customerSurname;//surname of the customer
-    PhoneNumber customerPhone;//phone number of the customer
-    Date attendDate;//attend date of the customer to the system
+    private CustomerId customerId;//id of the customer
+    private String customerName;//name of the customer
+    private String customerSurname;//surname of the customer
+    private PhoneNumber customerPhone;//phone number of the customer
+    private Date attendDate;//attend date of the customer to the system
 }

@@ -23,4 +23,6 @@ public class Transaction {
     BigDecimal amount;//amont of the transaction
     String explanation;//special note of the transaction
     TransactionType transactionType;//type of the transaction, it can be DEPOSIT, WITHDRAW OR TRANSFER
+
+
 }

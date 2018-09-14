@@ -17,10 +17,10 @@ import java.util.Date;
  * Bank account of the Customer
  */
 public class Account {
-    AccountId accountId; //Id of the account ,starts with ACC-{id}
-    Date openDate;//open date of the account
-    BigDecimal currentBalance; //current balance of the account
+    private AccountId accountId; //Id of the account ,starts with ACC-{id}
+    private Date openDate;//open date of the account
+    private BigDecimal currentBalance; //current balance of the account
     @NonNull
-    CustomerId customerId;//customer id belongs the owner of the account
+    private CustomerId customerId;//customer id belongs the owner of the account
 
 }
