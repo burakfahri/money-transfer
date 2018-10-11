@@ -2,14 +2,16 @@ package pl.com.revolut.web;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.common.utils.impl.IdGenerator;
-import pl.com.revolut.common.utils.web.WebUtils;
-import pl.com.revolut.impl.AccountServiceImpl;
-import pl.com.revolut.impl.CustomerServiceImpl;
 import pl.com.revolut.model.Account;
 import pl.com.revolut.model.Customer;
 import pl.com.revolut.model.identifier.AccountId;
@@ -20,124 +22,110 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
 
-@Path("/accounts")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Controller
+@RequestMapping("/accounts")
+@Slf4j
 public class AccountWebService {
-    private final AccountService accountService = AccountServiceImpl.getAccountServiceInstance();
-    private final CustomerService customerService = CustomerServiceImpl.getCustomerServiceInstance();
-    private static final String JSON_IS_NOT_VALID = "Json is not valid";
-    private static final String ID_IS_NOT_VALID = "Id is not valid";
-    private final Logger log = Logger.getLogger(AccountWebService.class);
-    private Gson gson = new Gson();
 
-    @GET
-    public Response getAllAccounts(){
-        String accountListJson = gson.toJson(accountService.getAllAccounts());
-        log.debug(accountListJson);
-        return Response.ok(accountListJson).build();
+    private AccountService accountService;
+    private CustomerService customerService;
+
+    @Autowired
+    public AccountWebService(AccountService accountService ,CustomerService customerService)
+    {
+        this.accountService = accountService;
+        this.customerService = customerService;
     }
 
-    @GET
-    @Path("/{accountId}")
-    public Response getAccountByAccountId(@PathParam("accountId") String accountId){
+    private Gson gson = new Gson();
+
+    @GetMapping
+    public ResponseEntity getAllAccounts(){
+        String accountListJson = gson.toJson(accountService.getAllAccounts());
+        log.debug(accountListJson);
+        return ResponseEntity.ok(accountListJson);
+    }
+
+    @GetMapping("/{accountId}")
+    public ResponseEntity getAccountByAccountId(@PathVariable("accountId") String accountId){
         Account account;
         try {
             account = accountService.getAccountById(new AccountId(accountId));
             if(account == null)
-                return Response.status(Response.Status.NOT_FOUND).entity("Account does not exist").build();
-        } catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Account id is not acceptable").build();
-        }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
+                return ResponseEntity.notFound().build();
+        } catch (NullParameterException | IdException |JsonSyntaxException e) {
+            return ResponseEntity.badRequest().build();
         }
-        return Response.ok(gson.toJson(account)).build();
+        return ResponseEntity.ok(gson.toJson(account));
     }
 
 
-    @POST
-    public Response createAccount(String stringAccount,@Context UriInfo uriInfo){
-
+    @PostMapping
+    public ResponseEntity createAccount(@RequestBody String stringAccount){
         URI uri;
         try {
-
-            log.info(uriInfo);
             Account account = gson.fromJson(stringAccount,Account.class);
             if(account.getAccountId() != null)
-                return Response.status(Response.Status.NOT_FOUND).entity("Accound id must " +
-                        "be null while creating new account").build();
+                return ResponseEntity.notFound().build();
 
             String accountId = IdGenerator.generateAccountId();
             account.setAccountId(new AccountId(accountId));
             Customer customer = customerService.getCustomerById(account.getCustomerId());
             if(customer == null)
-                return Response.status(Response.Status.BAD_REQUEST).entity("Customer id does not exist").build();
-            uri = WebUtils.generateUri(uriInfo,accountId);
+                return ResponseEntity.badRequest().build();
             accountService.addOrUpdateAccount(account);
-        }catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Account model is wrong").build();
-        }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
-        }
-
-        return Response.created(uri).build();
+            uri = ServletUriComponentsBuilder.fromCurrentRequest().path(
+                    "/{id}").buildAndExpand(customer.getCustomerId()).toUri();
+        }catch (NullParameterException | IdException |JsonSyntaxException e) {
+        return ResponseEntity.badRequest().build();
     }
 
-    @PUT
-    @Path("/{accountId}")
-    public Response updateAccount(String stringAccount,@PathParam("accountId") String accountId){
+
+        return ResponseEntity.created(uri).build();
+    }
+
+    @PutMapping("/{accountId}")
+    public ResponseEntity updateAccount(@RequestBody  String stringAccount,@PathVariable("accountId") String accountId) {
 
         Account account;
 
         try {
-            account = gson.fromJson(stringAccount,Account.class);
+            account = gson.fromJson(stringAccount, Account.class);
 
             Account oldAccount = accountService.getAccountById(new AccountId(accountId));
 
-            if(oldAccount == null)
-                return Response.status(Response.Status.NOT_FOUND).entity(accountId).build();
+            if (oldAccount == null)
+                return ResponseEntity.notFound().build();
 
             account.setAccountId(new AccountId(accountId));
 
             Customer customer = customerService.getCustomerById(account.getCustomerId());
-            if(customer == null)
-                return Response.status(Response.Status.BAD_REQUEST).entity("Customer id is wrong").build();
+            if (customer == null)
+                return ResponseEntity.badRequest().build();
 
             accountService.addOrUpdateAccount(account);
 
-        }catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Account model is wrong").build();
-        } catch (IdException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Account id is not valid").build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
+        } catch (NullParameterException | IdException | JsonSyntaxException e) {
+            return ResponseEntity.badRequest().build();
         }
+        return ResponseEntity.ok(gson.toJson(account));
 
-        return Response.ok().entity(gson.toJson(account)).build();
     }
 
-    @DELETE
-    @Path("/{accountId}")
-    public Response deleteAccount(@PathParam("accountId") String accountId){
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity deleteAccount(@PathVariable("accountId") String accountId) {
         Account account;
         try {
             account = accountService.removeAccount(new AccountId(accountId));
-            if(account == null)
-                return Response.status(Response.Status.NOT_FOUND).entity("Account is not found "+ accountId).build();
-        }catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Account id is null").build();
-        } catch (IdException | AccountException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
+            if (account == null)
+                return ResponseEntity.notFound().build();
+        } catch (NullParameterException | IdException | JsonSyntaxException | AccountException e) {
+            return ResponseEntity.badRequest().build();
         }
-        return Response.ok(gson.toJson(account)).build();
+        return ResponseEntity.ok(gson.toJson(account));
     }
-
 
 
 }

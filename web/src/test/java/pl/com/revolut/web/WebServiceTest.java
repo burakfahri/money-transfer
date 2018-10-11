@@ -15,6 +15,12 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
@@ -41,21 +47,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
 public class WebServiceTest {
 
-    protected static Server server = null;
     protected static HttpClient client ;
     protected static PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
-    protected URIBuilder builder = new URIBuilder().setScheme("http").setHost("localhost:8084");
+    protected URIBuilder builder = new URIBuilder().setScheme("http");
     protected Gson gson = new Gson();
-    protected static AccountService accountService = null;
-    protected static TransactionService transactionService = null;
-    protected static CustomerService customerService = null;
+    @Autowired  protected  AccountService accountService = null;
+    @Autowired  protected  TransactionService transactionService = null;
+    @Autowired  protected  CustomerService customerService = null;
+
+    @LocalServerPort
+    private int port;
 
 
     @BeforeClass
     public static void setup() throws Exception {
-        startServer();
         connManager.setDefaultMaxPerRoute(100);
         connManager.setMaxTotal(200);
 
@@ -63,13 +71,6 @@ public class WebServiceTest {
                 .setConnectionManager(connManager)
                 .setConnectionManagerShared(true)
                 .build();
-        init();
-    }
-
-    @AfterClass
-    public static void closeClient() throws Exception{
-        //server.stop();
-        HttpClientUtils.closeQuietly(client);
     }
 
     public  List<Customer> createMockCustomerList(int count) throws PhoneNumberException, NullParameterException, IdException {
@@ -138,7 +139,7 @@ public class WebServiceTest {
             httpRequestBase = new HttpGet();
         if(httpRequestBase == null)
             return null;
-        URI uri = builder.setPath(uriStr).build();
+        URI uri = builder.setPath(uriStr).setHost("localhost:"+port).build();
         httpRequestBase.setURI(uri);
         httpRequestBase.setHeader("Content-type", "application/json");
         return client.execute(httpRequestBase);
@@ -147,7 +148,7 @@ public class WebServiceTest {
 
     public HttpResponse executeHttpEntityEnclosingRequestBase(String uriStr, String entityString, String methodName) throws IOException, URISyntaxException {
         HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = null;
-        URI uri = builder.setPath(uriStr).build();
+        URI uri = builder.setPath(uriStr).setHost("localhost:"+port).build();
         if(methodName.equals(HttpPost.METHOD_NAME))
             httpEntityEnclosingRequestBase = createHttpPost(uri,entityString);
         else if(methodName.equals(HttpPut.METHOD_NAME))
@@ -165,28 +166,5 @@ public class WebServiceTest {
             request.setEntity(entity);
         }
         request.setHeader("Content-type", "application/json");
-    }
-
-    private static void init() throws NullParameterException {
-        accountService = AccountServiceImpl.getAccountServiceInstance();
-        transactionService = TransactionServiceImpl.getTransactionServiceInstance();
-        customerService = CustomerServiceImpl.getCustomerServiceInstance();
-
-        transactionService.setAccountService(accountService);
-        accountService.setCustomerService(customerService);
-    }
-
-    private static void startServer() throws Exception {
-        if (server == null) {
-            server = new Server(8084);
-            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-            context.setContextPath("/");
-            server.setHandler(context);
-            ServletHolder servletHolder = context.addServlet(ServletContainer.class, "/*");
-            servletHolder.setInitParameter("jersey.config.server.provider.classnames",
-                    AccountWebService.class.getCanonicalName()+","+TransactionWebService.class.getCanonicalName()+","+
-                            CustomerWebService.class.getCanonicalName());
-            server.start();
-        }
     }
 }

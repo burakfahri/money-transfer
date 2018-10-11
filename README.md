@@ -5,19 +5,17 @@
 ---
 Money transfer project allows people the transfer money between accounts
 
-## build
-
-```
-clean install compile assembly:single
-```
 ## run
-
 ```
-java -jar ~/.m2/repository/pl/com/revolut/money-transfer-main/1.0/money-transfer-main-1.0-jar-with-dependencies.jar
+mvn spring-boot run
 ```
 ## logs file
 ```
 ./logs/money-transfer
+```
+## swagger docs
+```
+http://localhost:8080/swagger-ui.html#/
 ```
 ## architecture
 ![model architecture](/docs/model.png)

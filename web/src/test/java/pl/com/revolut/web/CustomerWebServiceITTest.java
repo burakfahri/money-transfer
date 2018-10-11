@@ -9,9 +9,17 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.exception.*;
 
+import pl.com.revolut.impl.AccountServiceImpl;
+import pl.com.revolut.impl.CustomerServiceImpl;
+import pl.com.revolut.impl.TransactionServiceImpl;
 import pl.com.revolut.model.Customer;
 import pl.com.revolut.model.identifier.CustomerId;
 
@@ -24,6 +32,10 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = {CustomerWebService.class, AccountServiceImpl.class, CustomerServiceImpl.class, TransactionServiceImpl.class})
+@EnableAutoConfiguration
 public class CustomerWebServiceITTest extends WebServiceTest{
 
     @Before

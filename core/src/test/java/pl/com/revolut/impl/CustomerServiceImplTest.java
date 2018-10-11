@@ -3,6 +3,11 @@ package pl.com.revolut.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.IdException;
@@ -19,36 +24,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class CustomerServiceImplTest {
-    public static List<Customer> customerList = new ArrayList<>();
-    private static CustomerService customerService = null;
 
-    public static List<Customer> createMockCustomer(int count) throws PhoneNumberException, NullParameterException, IdException{
-        if(count > 499)
-            count = 499;
-        for (int i = 0 ;i< count;i ++) {
-            Customer customer = new Customer();
-            customer.setCustomerName("burak"+ count);
-            customer.setCustomerSurname("cabuk"+count);
-            customer.setCustomerPhone(new PhoneNumber(530+count, 250+count, 400+count));
-            customer.setCustomerId(new CustomerId(IdGenerator.generateCustomerId()));
-            customer.setAttendDate(Calendar.getInstance().getTime());
-            customerService.addOrUpdateCustomer(customer);
-            customerList.add(customer);
-        }
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = {CustomerServiceImpl.class,AccountServiceImpl.class,TransactionServiceImpl.class})
+public class CustomerServiceImplTest extends  AbstractServiceImplTest{
 
-        return customerList;
-
-    }
-
-    public static void setCustomerService(CustomerService customerServiceP)
-    {
-        customerService = customerServiceP;
-    }
+    @Autowired private CustomerService customerService;
 
     @Before
     public void setup() throws PhoneNumberException, NullParameterException, IdException {
-        setCustomerService(CustomerServiceImpl.getCustomerServiceInstance());
+
         customerList.clear();
     }
 
@@ -122,6 +108,7 @@ public class CustomerServiceImplTest {
 
 
         List<Customer> customers = createMockCustomer(1);
+        customerService.addOrUpdateCustomer(customers.get(0));
         AccountId accountId = new AccountId("ACC-1");
         customerService.addAccountToCustomer(customers.get(0).getCustomerId(),accountId);
         customerService.addAccountToCustomer(customers.get(0).getCustomerId(),accountId);

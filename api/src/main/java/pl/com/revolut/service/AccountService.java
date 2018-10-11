@@ -10,11 +10,6 @@ import java.util.List;
 
 public interface AccountService {
 
-    /**
-     * sets the customer service to the account service to attach account to customer
-     * @param customerService which stores customers
-     */
-    void setCustomerService(CustomerService customerService) throws NullParameterException;
 
     /**
      * @return all the accounts in the store

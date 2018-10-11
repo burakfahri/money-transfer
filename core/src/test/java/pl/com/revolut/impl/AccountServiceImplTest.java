@@ -3,7 +3,11 @@ package pl.com.revolut.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import pl.com.revolut.common.utils.impl.IdGenerator;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import pl.com.revolut.exception.*;
 import pl.com.revolut.model.Account;
 import pl.com.revolut.model.identifier.AccountId;
@@ -12,44 +16,22 @@ import pl.com.revolut.service.AccountService;
 import pl.com.revolut.service.CustomerService;
 import pl.com.revolut.service.TransactionService;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 
-public class AccountServiceImplTest {
-    public static List<Account> accountList = new ArrayList<>();
-    private static CustomerService customerService = null;
-    private AccountService accountService = null;
-    private TransactionService transactionService = null;
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = {AccountServiceImpl.class,CustomerServiceImpl.class,TransactionServiceImpl.class})
+public class AccountServiceImplTest extends  AbstractServiceImplTest{
 
-    public static List<Account> createMockAccount(int count) throws NullParameterException, IdException, PhoneNumberException {
-        CustomerServiceImplTest.createMockCustomer(1);
+    @Autowired private CustomerService customerService;
+    @Autowired private AccountService accountService ;
+    @Autowired private TransactionService transactionService ;
 
-        for (int i = 0 ;i< count;i ++) {
-            Account account = new Account();
-            String accIdStr = IdGenerator.generateAccountId();
-            account.setAccountId(new AccountId(accIdStr));
-            account.setCurrentBalance(new BigDecimal(100.0));
-            account.setCustomerId(CustomerServiceImplTest.customerList.get(0).getCustomerId());
-            account.setOpenDate(new Date());
-            accountList.add(account);
-
-        }
-
-        return accountList;
-
-    }
 
     @Before
     public void setup() throws PhoneNumberException, NullParameterException, IdException, AccountException, TransactionException {
-        customerService = CustomerServiceImpl.getCustomerServiceInstance();
-        accountService = AccountServiceImpl.getAccountServiceInstance();
-        transactionService = TransactionServiceImpl.getTransactionServiceInstance();
-        accountService.setCustomerService(customerService);
-        CustomerServiceImplTest.setCustomerService(customerService);
-        transactionService.setAccountService(accountService);
-        AccountServiceImplTest.accountList.clear();
         transactionService.removeAllTransactions();
         accountService.removeAllAccounts();
     }
@@ -127,8 +109,6 @@ public class AccountServiceImplTest {
 
     @Test(expected = AccountException.class)
     public void addTransactionToAccountTwiceTest() throws PhoneNumberException, IdException, NullParameterException, AccountException {
-
-
         List<Account> accounts = createMockAccount(1);
         TransactionId transactionId = new TransactionId("TRA-1");
         accountService.addTransactionToAccount(accounts.get(0).getAccountId(),transactionId);

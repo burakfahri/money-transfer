@@ -8,12 +8,24 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.util.EntityUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.web.WebDelegatingSmartContextLoader;
 import pl.com.revolut.common.utils.impl.IdGenerator;
 import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.exception.PhoneNumberException;
 import pl.com.revolut.exception.TransactionException;
+import pl.com.revolut.impl.AccountServiceImpl;
+import pl.com.revolut.impl.CustomerServiceImpl;
+import pl.com.revolut.impl.TransactionServiceImpl;
 import pl.com.revolut.model.Account;
 import pl.com.revolut.model.identifier.AccountId;
 
@@ -29,6 +41,11 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by Burak Cabuk .
  */
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = {AccountWebService.class, AccountServiceImpl.class, CustomerServiceImpl.class, TransactionServiceImpl.class})
+@EnableAutoConfiguration
 public class AccountWebServiceITTest extends WebServiceTest{
     @Before
     public void before() throws NullParameterException, AccountException, TransactionException {

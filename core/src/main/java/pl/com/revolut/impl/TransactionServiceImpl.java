@@ -1,5 +1,8 @@
 package pl.com.revolut.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import pl.com.revolut.exception.*;
 import pl.com.revolut.common.service.StorageService;
 import pl.com.revolut.common.utils.impl.ServiceUtils;
@@ -18,49 +21,36 @@ import java.util.List;
 /**
  * @see TransactionService
  */
+
+@Service
+@Slf4j
 public class TransactionServiceImpl extends StorageService<TransactionId, Transaction> implements TransactionService {
-    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(TransactionServiceImpl.class);
 
-    private static TransactionService transactionServiceInstance = null;
-    private static AccountService accountServiceInstance = null;
+    private AccountService accountServiceInstance = null;
 
-    private TransactionServiceImpl() {
-        super();
-    }
-
-    public static synchronized TransactionService getTransactionServiceInstance() {
-        if (transactionServiceInstance == null) {
-            transactionServiceInstance = new TransactionServiceImpl();
-            logger.info("Transaction service instantiated");
-
-        }
-        return transactionServiceInstance;
-    }
-
-    public void setAccountService(final AccountService accountService) throws NullParameterException {
-        ServiceUtils.checkParameters(accountService);
-        logger.info("Account Service setted into Transtaction service instantiated");
-        accountServiceInstance = accountService;
+    @Autowired
+    public TransactionServiceImpl(AccountService accountService) {
+        this.accountServiceInstance = accountService;
     }
 
     @Override
-    public List<Transaction> getAllTransactions() {
-        logger.info("returning all transactions");
+    public synchronized List<Transaction> getAllTransactions() {
+        log.info("returning all transactions");
         return Collections.unmodifiableList(super.getAll());
     }
 
     public void addOrUpdateTransaction(final Transaction transaction) throws NullParameterException {
         ServiceUtils.checkParameters(transaction);
-        logger.info("add or update transaction "+transaction);
+        log.info("add or update transaction "+transaction);
 
         super.addOrUpdateItem(transaction.getTransactionId(), transaction);
     }
 
 
     @Override
-    public Transaction getTransactionById(final TransactionId transactionId) throws NullParameterException {
+    public synchronized Transaction getTransactionById(final TransactionId transactionId) throws NullParameterException {
         ServiceUtils.checkParameters(transactionId);
-        logger.info("fetching all transactions by id "+transactionId);
+        log.info("fetching all transactions by id "+transactionId);
         return super.getItem(transactionId);
     }
 
@@ -68,14 +58,14 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
             NullParameterException, AccountException {
 
         if (accountServiceInstance == null) {
-            logger.error("Account service does not set");
+            log.error("Account service does not set");
             throw new AccountServiceException();
         }
         ServiceUtils.checkParameters(accountId,amount);
         final Account account = accountServiceInstance.getAccountById(accountId);
 
         if (account == null) {
-            logger.error("Account does not exit "+ account);
+            log.error("Account does not exit "+ account);
 
             throw new AccountException();
         }
@@ -83,11 +73,11 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
     }
 
     @Override
-    public Transaction deposit(final AccountId accountId, final BigDecimal amount) throws NullParameterException, AccountServiceException,
+    public synchronized Transaction deposit(final AccountId accountId, final BigDecimal amount) throws NullParameterException, AccountServiceException,
             AccountException, IdException {
 
         Account account = checkParametersAndReturnAccount(accountId,amount);
-        logger.info("deposit for account "+account);
+        log.info("deposit for account "+account);
 
         Transaction transaction = ServiceUtils.createDepositOrWithDrawTransaction(amount, TransactionType.DEPOSIT,accountId);
 
@@ -115,7 +105,7 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
             throws TransactionException, NullParameterException {
 
         if (amount.compareTo(account.getCurrentBalance()) > 0) {
-            logger.error("ACCOUNT IS NOT ABLE TO WITHDRAW");
+            log.error("ACCOUNT IS NOT ABLE TO WITHDRAW");
             throw new TransactionException("ACCOUNT IS NOT ABLE TO WITHDRAW");
         }
         accountServiceInstance.addTransactionToAccount(account.getAccountId(),transactionId);
@@ -123,16 +113,16 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
     }
 
     @Override
-    public Transaction withDraw(final AccountId accountId,final BigDecimal amount) throws AccountServiceException, NullParameterException,
+    public synchronized Transaction withDraw(final AccountId accountId,final BigDecimal amount) throws AccountServiceException, NullParameterException,
             AccountException, TransactionException, IdException {
 
         Account account = checkParametersAndReturnAccount(accountId,amount);
 
         Transaction transaction = ServiceUtils.createDepositOrWithDrawTransaction(amount, TransactionType.WITHDRAW,accountId);
-        logger.info("withdraw for account "+account);
+        log.info("withdraw for account "+account);
 
         if(transaction == null) {
-            logger.error("transaction could not create");
+            log.error("transaction could not create");
             throw new TransactionException();
         }
         removeMoneyFromTheAccount(account,transaction.getTransactionId(),amount);
@@ -142,7 +132,7 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
     }
 
     @Override
-    public Transaction transfer(final AccountId senderAccountId,final AccountId receiverAccountId, BigDecimal amount,String expl)
+    public synchronized Transaction transfer(final AccountId senderAccountId,final AccountId receiverAccountId, BigDecimal amount,String expl)
             throws AccountException, TransactionException, NullParameterException, AccountServiceException, IdException {
         Account receiverAccount = checkParametersAndReturnAccount(receiverAccountId,amount);
         Account senderAccount = checkParametersAndReturnAccount(senderAccountId,amount);
@@ -154,7 +144,7 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
         addMoneyFromTheAccount(receiverAccount,transaction.getTransactionId(),amount);
 
         addOrUpdateTransaction(transaction);
-        logger.info("transfer for sender account "+senderAccount + " to " + receiverAccount + " amount =  " + amount +
+        log.info("transfer for sender account "+senderAccount + " to " + receiverAccount + " amount =  " + amount +
                 " explanation is " + expl);
 
         return transaction;
@@ -165,7 +155,7 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
             throw new NullParameterException();
         Transaction transaction = getTransactionById(transactionId);
         if(transaction == null) {
-            logger.error("Transaction does not exist with transactionId "+ transaction );
+            log.error("Transaction does not exist with transactionId "+ transaction );
             throw new TransactionException();
         }
         if(transaction.getReceiverAccountId() != null)
@@ -173,13 +163,13 @@ public class TransactionServiceImpl extends StorageService<TransactionId, Transa
         if(transaction.getSenderAccountId() != null)
             accountServiceInstance.removeTransactionFromAccount(transactionId,transaction.getSenderAccountId());
 
-        logger.info("removing transaction with id " + transactionId);
+        log.info("removing transaction with id " + transactionId);
         super.remove(transactionId);
     }
 
     @Override
-    public void removeAllTransactions() throws NullParameterException, TransactionException {
-        logger.info("removing all transactions");
+    public synchronized void removeAllTransactions() throws NullParameterException, TransactionException {
+        log.info("removing all transactions");
         for (Transaction transaction : super.getAll()) {
             removeTransaction(transaction.getTransactionId());
         }

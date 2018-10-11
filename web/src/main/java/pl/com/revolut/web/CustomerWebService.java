@@ -2,89 +2,86 @@ package pl.com.revolut.web;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.com.revolut.exception.AccountException;
 import pl.com.revolut.exception.IdException;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.common.utils.impl.IdGenerator;
-import pl.com.revolut.common.utils.web.WebUtils;
-import pl.com.revolut.impl.CustomerServiceImpl;
 import pl.com.revolut.model.Customer;
 import pl.com.revolut.model.identifier.CustomerId;
 import pl.com.revolut.service.CustomerService;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
-@Path("/customers")
+@RequestMapping("/customers")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Controller
+@Slf4j
 public class CustomerWebService {
-    private final CustomerService customerService = CustomerServiceImpl.getCustomerServiceInstance();
-    private static final Logger log = Logger.getLogger(AccountWebService.class);
     private Gson gson = new Gson();
-    private static final String CUSTOMER_ID_IS_NOT_VALID ="Customer id is not valid";
-    private static final String JSON_IS_NOT_VALID ="Json is not valid";
 
-    @GET
-    public Response getAllCustomers(){
-        String customerListJson = gson.toJson(customerService.getAllCustomers());
-        log.debug(customerListJson);
-        return Response.ok(customerListJson).build();
+    private CustomerService customerService;
+
+    @Autowired
+    public CustomerWebService(CustomerService customerService)
+    {
+        this.customerService = customerService;
     }
 
-    @GET
-    @Path("/{customerId}")
-    public Response getCustomerByCustomerId(@PathParam("customerId") String customerId){
+    @GetMapping
+    public ResponseEntity getAllCustomers(){
+        String customerListJson = gson.toJson(customerService.getAllCustomers());
+        log.debug(customerListJson);
+        return ResponseEntity.ok(customerListJson);
+    }
+
+    @GetMapping("/{customerId}")
+    public ResponseEntity getCustomerByCustomerId(@PathVariable("customerId") String customerId){
         Customer customer;
         try {
             customer = customerService.getCustomerById(new CustomerId(customerId));
             if(customer == null)
-                return Response.status(Response.Status.NOT_FOUND).build();
-        } catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Customer id con not be null").build();
-        }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(CUSTOMER_ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
+                return ResponseEntity.notFound().build();
+        }  catch (NullParameterException | IdException | JsonSyntaxException e) {
+            return ResponseEntity.badRequest().build();
         }
-        return Response.ok(gson.toJson(customer)).build();
+        return ResponseEntity.ok(gson.toJson(customer));
     }
 
 
-    @POST
-    public Response createCustomer(String stringCustomer,@Context UriInfo uriInfo){
+    @PostMapping
+    public ResponseEntity createCustomer(@RequestBody String stringCustomer){
         URI uri ;
         try {
-            log.info(uriInfo);
             Customer customer = gson.fromJson(stringCustomer,Customer.class);
             if(customer.getCustomerId() != null)
-                return Response.status(Response.Status.NOT_FOUND).entity("Customer id must " +
-                        "be null while creating new customer").build();
+                return ResponseEntity.notFound().build();
 
             String customerId = IdGenerator.generateCustomerId();
             customer.setCustomerId(new CustomerId(customerId));
 
-            uri = WebUtils.generateUri(uriInfo,customerId);
+            uri = ServletUriComponentsBuilder.fromCurrentRequest().path(
+                    "/{id}").buildAndExpand(customer.getCustomerId()).toUri();
+
             customerService.addOrUpdateCustomer(customer);
-        }catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Customer model is wrong").build();
-        }catch (IdException ie) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(CUSTOMER_ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
+        } catch (NullParameterException | IdException | JsonSyntaxException e) {
+            return ResponseEntity.badRequest().build();
         }
 
-        return Response.created(uri).build();
+        return ResponseEntity.created(uri).build();
     }
 
-    @PUT
-    @Path("/{customerId}")
-    public Response updateCustomer(String stringCustomer,@PathParam("customerId") String customerId){
+    @PutMapping("/{customerId}")
+    public ResponseEntity updateCustomer(@RequestBody String stringCustomer,@PathVariable("customerId") String customerId){
 
         Customer customer;
 
@@ -94,40 +91,31 @@ public class CustomerWebService {
             Customer oldCustomer = customerService.getCustomerById(new CustomerId(customerId));
 
             if(oldCustomer == null)
-                return Response.status(Response.Status.NOT_FOUND).entity(customerId).build();
+                return ResponseEntity.notFound().build();
 
             customer.setCustomerId(new CustomerId(customerId));
             
             customerService.addOrUpdateCustomer(customer);
 
-        }catch (NullParameterException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Customer model is wrong").build();
-        } catch (IdException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(CUSTOMER_ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
+        } catch (NullParameterException | IdException | JsonSyntaxException e) {
+            return ResponseEntity.badRequest().build();
         }
-        return Response.ok().entity(gson.toJson(customer)).build();
+        return ResponseEntity.ok(gson.toJson(customer));
     }
 
-    @DELETE
-    @Path("/{customerId}")
-    public Response deleteCustomer(@PathParam("customerId") String customerId){
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity deleteCustomer(@PathVariable("customerId") String customerId){
         Customer customer;
         try {
             customer = customerService.removeCustomer(new CustomerId(customerId));
             if(customer == null)
-                return Response.status(Response.Status.NOT_FOUND).entity("Customer is not found by id = "+ customerId).build();
-        }catch (NullParameterException e) {
-            return Response.serverError().entity("Customer id is null").build();
-        } catch (IdException e) {
-            return Response.serverError().entity(CUSTOMER_ID_IS_NOT_VALID).build();
-        }catch (JsonSyntaxException je) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(JSON_IS_NOT_VALID).build();
-        } catch (AccountException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+                return ResponseEntity.notFound().build();
+        }catch (NullParameterException | IdException e) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (AccountException | JsonSyntaxException e) {
+            return ResponseEntity.badRequest().build();
         }
-        return Response.ok().entity(gson.toJson(customer)).build();
+        return ResponseEntity.ok(gson.toJson(customer));
     }
 
 }
