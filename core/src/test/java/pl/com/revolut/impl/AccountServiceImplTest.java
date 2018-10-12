@@ -1,5 +1,6 @@
 package pl.com.revolut.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -23,6 +24,7 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = {AccountServiceImpl.class,CustomerServiceImpl.class,TransactionServiceImpl.class})
+@Slf4j
 public class AccountServiceImplTest extends  AbstractServiceImplTest{
 
     @Autowired private CustomerService customerService;
@@ -31,8 +33,14 @@ public class AccountServiceImplTest extends  AbstractServiceImplTest{
 
 
     @Before
-    public void setup() throws PhoneNumberException, NullParameterException, IdException, AccountException, TransactionException {
-        transactionService.removeAllTransactions();
+    public void setup() throws PhoneNumberException, NullParameterException, IdException, TransactionException, AccountException {
+        try {
+            transactionService.removeAllTransactions();
+        }
+        catch (AccountException e)
+        {
+            log.error(e.getMessage());
+        }
         accountService.removeAllAccounts();
     }
 

@@ -50,7 +50,7 @@ public interface AccountService {
      * @return the operation status
      * @throws NullParameterException if the parameters are null
      */
-    Boolean addTransactionToAccount(AccountId accountId, TransactionId transactionId) throws NullParameterException;
+    Boolean addTransactionToAccount(AccountId accountId, TransactionId transactionId) throws NullParameterException, AccountException;
 
 
     /**
@@ -60,7 +60,7 @@ public interface AccountService {
      * @return the operation status
      * @throws NullParameterException if the parameters are null
      */
-    Boolean removeTransactionFromAccount(TransactionId transactionId, AccountId accountId) throws NullParameterException;
+    Boolean removeTransactionFromAccount(TransactionId transactionId, AccountId accountId) throws NullParameterException, AccountException;
 
     /**
      *

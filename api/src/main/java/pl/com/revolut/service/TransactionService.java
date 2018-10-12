@@ -78,6 +78,6 @@ public interface TransactionService {
      * @throws NullParameterException if the parameters are null
      * @throws TransactionException if the transaction ids does not belongs to any transaction is the store
      */
-    void removeAllTransactions() throws NullParameterException, TransactionException;
+    void removeAllTransactions() throws NullParameterException, TransactionException, AccountException;
 
 }

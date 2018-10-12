@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public final class ServiceUtils {
     private ServiceUtils(){}
@@ -29,6 +30,14 @@ public final class ServiceUtils {
                 throw new NullParameterException(new StringBuilder().append("PARAMETER IS NULL").toString());
             }
     }
+
+
+    public static <T> boolean checkListContain(List<T> objectList, T object) throws NullParameterException {
+        checkParameters(objectList,object);
+        return objectList.contains(object);
+    }
+
+
 
     /**
      * create transaction according to its {@param transactionType}

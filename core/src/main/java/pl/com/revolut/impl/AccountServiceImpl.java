@@ -8,6 +8,7 @@ import pl.com.revolut.common.service.StorageService;
 import pl.com.revolut.exception.NullParameterException;
 import pl.com.revolut.common.utils.impl.ServiceUtils;
 import pl.com.revolut.model.Account;
+import pl.com.revolut.model.Transaction;
 import pl.com.revolut.model.identifier.AccountId;
 import pl.com.revolut.model.identifier.TransactionId;
 import pl.com.revolut.service.AccountService;
@@ -51,56 +52,69 @@ public class AccountServiceImpl extends StorageService<AccountId, Account> imple
         super.addOrUpdateItem(account.getAccountId(), account);
     }
 
-    @Override
-    public synchronized Account removeAccount(final AccountId accountId) throws NullParameterException, AccountException {
-        ServiceUtils.checkParameters(accountId);
+    private Account getAccount(AccountId accountId) throws NullParameterException, AccountException {
         Account account = super.getItem(accountId);
         if (account == null) {
             log.error("account id " + accountId + " does not belongs to any account");
             throw new AccountException();
         }
-        log.info("remove account " + account);
-
-        accountIdToTransactionId.remove(accountId);
+        return account;
+    }
+    private Account handleRemoveAccount(Account account) throws NullParameterException {
+        accountIdToTransactionId.remove(account.getAccountId());
         customerService.removeAccountFromCustomer(account.getCustomerId(), account.getAccountId());
-        return super.remove(accountId);
+        return super.remove(account.getAccountId());
+    }
+    @Override
+    public synchronized Account removeAccount(final AccountId accountId) throws NullParameterException, AccountException {
+        ServiceUtils.checkParameters(accountId);
+        Account account = getAccount(accountId);
+        log.info("remove account " + account);
+        return handleRemoveAccount(account);
     }
 
     @Override
     public synchronized Account getAccountById(final AccountId accountId) throws NullParameterException {
         ServiceUtils.checkParameters(accountId);
         log.info("account wanted for " + accountId);
-
         return super.getItem(accountId);
     }
 
-    @Override
-    public synchronized Boolean addTransactionToAccount(final AccountId accountId, TransactionId transactionId) throws NullParameterException {
-        ServiceUtils.checkParameters(transactionId, accountId);
-        List<TransactionId> transactionIdList = accountIdToTransactionId.getOrDefault(accountId, new ArrayList<>());
-        if (transactionIdList.contains(transactionId)) {
-            log.error("transaction already exist for transaction id = " + transactionId);
-            return false;
-        }
+    public boolean addTransactionToAccount(List<TransactionId> transactionIdList, TransactionId transactionId ,
+                                               AccountId accountId){
+
         transactionIdList.add(transactionId);
         accountIdToTransactionId.put(accountId, transactionIdList);
         log.info("transaction added to account with transaction id =  " + transactionId + " account id = " + accountId);
-
         return true;
     }
 
     @Override
-    public synchronized Boolean removeTransactionFromAccount(final TransactionId transactionId, AccountId accountId) throws NullParameterException {
+    public synchronized Boolean addTransactionToAccount(final AccountId accountId, TransactionId transactionId)
+            throws NullParameterException, AccountException {
         ServiceUtils.checkParameters(transactionId, accountId);
-        List<TransactionId> transactionIdList = accountIdToTransactionId.getOrDefault(accountId, new ArrayList<>());
-        if (!transactionIdList.contains(transactionId)) {
-            log.error("transaction does not exist for transaction id = " + transactionId);
-            return false;
-        }
+        List<TransactionId> transactionIdList = getTransactionsOfAccount(accountId);
+
+        return !ServiceUtils.checkListContain(transactionIdList,transactionId) &&
+                addTransactionToAccount(transactionIdList,transactionId,accountId);
+    }
+
+    private boolean handleRemoveTransactionFromAccount(List<TransactionId> transactionIdList ,
+                                                       final TransactionId transactionId, AccountId accountId) {
         transactionIdList.remove(transactionId);
         accountIdToTransactionId.put(accountId, transactionIdList);
-        log.info("transaction removed for transactionId = " + transactionId);
         return true;
+    }
+
+    @Override
+    public synchronized Boolean removeTransactionFromAccount(final TransactionId transactionId, final AccountId accountId)
+            throws NullParameterException, AccountException {
+
+        ServiceUtils.checkParameters(transactionId, accountId);
+        log.info("transaction removing for transactionId = " + transactionId);
+        List<TransactionId> transactionIdList =  getTransactionsOfAccount(accountId);
+        return ServiceUtils.checkListContain(transactionIdList,transactionId) &&
+                handleRemoveTransactionFromAccount(transactionIdList,transactionId,accountId);
     }
 
     @Override

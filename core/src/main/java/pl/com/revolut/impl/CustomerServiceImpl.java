@@ -58,33 +58,39 @@ public class CustomerServiceImpl extends StorageService<CustomerId,Customer> imp
         return super.getItem(customerId);
     }
 
-    @Override
-    public synchronized Boolean addAccountToCustomer(final CustomerId customerId, final AccountId accountId) throws NullParameterException {
-        ServiceUtils.checkParameters(customerId,accountId);
-        List<AccountId> accountIdList = customerIdToAccountId.getOrDefault(customerId,new ArrayList<>());
-        if(accountIdList.contains(accountId)) {
-            log.error("Account already exist for customer id = "+customerId);
-            return false;
-        }
+    private Boolean handleAddAccountToCustomer(List<AccountId> accountIdList,final CustomerId customerId, final AccountId accountId)
+    {
         accountIdList.add(accountId);
         customerIdToAccountId.put(customerId,accountIdList);
         log.info("Add account to customer cus id "+customerId + " account id "+ accountId);
-
         return true;
     }
 
     @Override
-    public synchronized Boolean removeAccountFromCustomer(final CustomerId customerId, final AccountId accountId) throws NullParameterException {
+    public synchronized Boolean addAccountToCustomer(final CustomerId customerId, final AccountId accountId) throws NullParameterException {
         ServiceUtils.checkParameters(customerId,accountId);
         List<AccountId> accountIdList = customerIdToAccountId.getOrDefault(customerId,new ArrayList<>());
-        if(!accountIdList.contains(accountId)) {
-            log.error("Account does not exist for customer id = "+customerId + " account id "+ accountId);
-            return false;
-        }
+        return !ServiceUtils.checkListContain(accountIdList,accountId)
+                && handleAddAccountToCustomer(accountIdList,customerId,accountId);
+    }
+
+
+
+    private Boolean handleRemoveAccountFromCustomer(List<AccountId> accountIdList,final CustomerId customerId,
+                                                 final AccountId accountId){
         accountIdList.remove(accountId);
         customerIdToAccountId.put(customerId,accountIdList);
         log.info("removing account "+ customerId);
         return true;
+    }
+
+
+    @Override
+    public synchronized Boolean removeAccountFromCustomer(final CustomerId customerId, final AccountId accountId) throws NullParameterException {
+        ServiceUtils.checkParameters(customerId,accountId);
+        List<AccountId> accountIdList = getCustomerAccounts(customerId);
+        return ServiceUtils.checkListContain(accountIdList,accountId) &&
+                handleRemoveAccountFromCustomer(accountIdList,customerId,accountId);
     }
 
     @Override
